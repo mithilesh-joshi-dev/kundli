@@ -9,6 +9,8 @@ from rich.text import Text
 from ..calc.aspects import get_aspects, get_house_aspects
 from ..calc.constants import RASHIS, RASHI_ELEMENTS, RASHI_QUALITIES, NAKSHATRA_LORDS, NAKSHATRAS
 from ..calc.dasha import calculate_dasha
+from ..calc.matching import calculate_matching
+from ..calc.nakshatra_attrs import get_nakshatra_attrs
 from ..calc.navamsa import calculate_navamsa
 from ..calc.panchang import calculate_panchang
 from ..calc.strength import RASHI_LORDS, get_dignity
@@ -73,11 +75,14 @@ def _print_panchang(chart: Chart, panchang: dict) -> None:
     nak_idx = NAKSHATRAS.index(moon_nak)
     nak_lord = NAKSHATRA_LORDS[nak_idx]
 
+    attrs = get_nakshatra_attrs(nak_idx)
     lines = [
         f"[bold]Vara (Day):[/bold] {panchang['vara']}    [bold]Tithi:[/bold] {panchang['tithi']}",
         f"[bold]Yoga:[/bold] {panchang['yoga']}    [bold]Karana:[/bold] {panchang['karana']}",
         f"[bold]Birth Star:[/bold] {moon_nak} (Pada {moon_pada})    [bold]Nakshatra Lord:[/bold] {nak_lord}",
         f"[bold]Moon Rashi:[/bold] {moon.rashi}    [bold]Rashi Lord:[/bold] {RASHI_LORDS[moon.rashi]}",
+        f"[bold]Gana:[/bold] {attrs['gana']}    [bold]Yoni:[/bold] {attrs['yoni']} ({attrs['yoni_gender']})"
+        f"    [bold]Nadi:[/bold] {attrs['nadi']}    [bold]Varna:[/bold] {attrs['varna']}",
     ]
     console.print(Panel("\n".join(lines), title="Panchang & Birth Star"))
 
@@ -336,3 +341,81 @@ def _print_dasha(chart: Chart) -> None:
             continue  # Already printed above
         console.print(f"[dim]  {lord} ({start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}): "
                       f"{', '.join(f'{al}' for al, _, _ in antardashas)}[/dim]")
+
+
+def print_matching(bride_chart: Chart, groom_chart: Chart) -> None:
+    """Print Ashtakoot Milan (marriage compatibility) report."""
+    results = calculate_matching(bride_chart, groom_chart)
+
+    # Bride and Groom info
+    b_moon = next(p for p in bride_chart.planets if p.name == "Moon")
+    g_moon = next(p for p in groom_chart.planets if p.name == "Moon")
+    b_nak_idx = NAKSHATRAS.index(b_moon.nakshatra)
+    g_nak_idx = NAKSHATRAS.index(g_moon.nakshatra)
+    b_attrs = get_nakshatra_attrs(b_nak_idx)
+    g_attrs = get_nakshatra_attrs(g_nak_idx)
+
+    console.print()
+    console.print(Panel.fit(
+        f"[bold cyan]Bride:[/bold cyan]  Moon in {b_moon.rashi} | {b_moon.nakshatra} Pada {b_moon.nakshatra_pada}"
+        f" | Gana: {b_attrs['gana']} | Yoni: {b_attrs['yoni']} | Nadi: {b_attrs['nadi']}\n"
+        f"[bold cyan]Groom:[/bold cyan]  Moon in {g_moon.rashi} | {g_moon.nakshatra} Pada {g_moon.nakshatra_pada}"
+        f" | Gana: {g_attrs['gana']} | Yoni: {g_attrs['yoni']} | Nadi: {g_attrs['nadi']}",
+        title="Ashtakoot Milan (Kundli Matching)",
+    ))
+    console.print()
+
+    table = Table(title="Compatibility Scores", show_lines=True)
+    table.add_column("Koota", style="bold", min_width=14)
+    table.add_column("Score", justify="center", min_width=8)
+    table.add_column("Max", justify="center", min_width=5)
+    table.add_column("Details", min_width=40)
+
+    total = 0.0
+    max_total = 0.0
+
+    for koota, score, max_score, desc in results:
+        total += score
+        max_total += max_score
+        if score == max_score:
+            style = "green"
+        elif score >= max_score / 2:
+            style = "yellow"
+        else:
+            style = "red"
+        table.add_row(
+            koota,
+            f"[{style}]{score:.1f}[/{style}]",
+            f"{max_score:.0f}",
+            desc,
+        )
+
+    # Total row
+    pct = (total / max_total) * 100
+    if pct >= 60:
+        total_style = "bold green"
+    elif pct >= 40:
+        total_style = "bold yellow"
+    else:
+        total_style = "bold red"
+
+    table.add_row(
+        "[bold]TOTAL[/bold]",
+        f"[{total_style}]{total:.1f}[/{total_style}]",
+        f"{max_total:.0f}",
+        f"[{total_style}]{pct:.0f}%[/{total_style}]",
+    )
+
+    console.print(table)
+
+    # Verdict
+    console.print()
+    if pct >= 60:
+        verdict = "[bold green]Excellent match! (≥18/36) — Marriage is recommended.[/bold green]"
+    elif pct >= 50:
+        verdict = "[bold yellow]Good match (18-21/36) — Marriage is acceptable with some adjustments.[/bold yellow]"
+    elif pct >= 40:
+        verdict = "[bold yellow]Average match — Consider carefully, remedies may be needed.[/bold yellow]"
+    else:
+        verdict = "[bold red]Below average match — Marriage is not recommended without significant remedies.[/bold red]"
+    console.print(Panel.fit(verdict, title="Verdict"))

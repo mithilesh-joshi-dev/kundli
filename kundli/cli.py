@@ -7,7 +7,7 @@ from rich.table import Table
 from .calc.engine import calculate_chart
 from .calc.geocode import fuzzy_search, lookup_city
 from .calc.transit import calculate_transits
-from .display.terminal import print_chart
+from .display.terminal import print_chart, print_matching
 from .models import BirthData
 
 app = typer.Typer(help="Kundli - Vedic Astrology Birth Chart Generator")
@@ -124,6 +124,30 @@ def transit(
             )
 
         console.print(table)
+
+
+@app.command("match")
+def match(
+    bride_date: str = typer.Option(..., "--bride-date", help="Bride birth date (YYYY-MM-DD)"),
+    bride_time: str = typer.Option(..., "--bride-time", help="Bride birth time (HH:MM or HH:MM:SS)"),
+    bride_place: Optional[str] = typer.Option(None, "--bride-place", help="Bride city name"),
+    bride_lat: Optional[float] = typer.Option(None, "--bride-lat", help="Bride latitude"),
+    bride_lon: Optional[float] = typer.Option(None, "--bride-lon", help="Bride longitude"),
+    groom_date: str = typer.Option(..., "--groom-date", help="Groom birth date (YYYY-MM-DD)"),
+    groom_time: str = typer.Option(..., "--groom-time", help="Groom birth time (HH:MM or HH:MM:SS)"),
+    groom_place: Optional[str] = typer.Option(None, "--groom-place", help="Groom city name"),
+    groom_lat: Optional[float] = typer.Option(None, "--groom-lat", help="Groom latitude"),
+    groom_lon: Optional[float] = typer.Option(None, "--groom-lon", help="Groom longitude"),
+    utc_offset: float = typer.Option(5.5, "--utc", help="UTC offset in hours"),
+):
+    """Ashtakoot Milan — marriage compatibility matching."""
+    bride_birth = _parse_birth(bride_date, bride_time, bride_lat, bride_lon, bride_place, utc_offset)
+    groom_birth = _parse_birth(groom_date, groom_time, groom_lat, groom_lon, groom_place, utc_offset)
+
+    bride_chart = calculate_chart(bride_birth)
+    groom_chart = calculate_chart(groom_birth)
+
+    print_matching(bride_chart, groom_chart)
 
 
 @app.command("search")
