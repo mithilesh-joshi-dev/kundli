@@ -1,0 +1,17 @@
+[project]
+name = "kundli"
+version = "0.1.0"
+description = "Vedic Astrology Birth Chart Generator"
+requires-python = ">=3.10"
+dependencies = [
+    "pyswisseph>=2.10",
+    "typer>=0.9",
+    "rich>=13.0",
+]
+
+[project.scripts]
+kundli = "kundli.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
