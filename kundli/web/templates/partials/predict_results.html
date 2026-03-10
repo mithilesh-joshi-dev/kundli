@@ -99,12 +99,31 @@
             </div>
             {% endif %}
 
+            {% if pred.yogas_active %}
+            <div class="flex flex-wrap gap-1.5 mb-3">
+                {% for yoga in pred.yogas_active %}
+                <span class="text-[10px] bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 font-medium">✦ {{ yoga }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             {% if pred.life_areas %}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {% for area, advice in pred.life_areas.items() %}
-                <div class="bg-gray-50 rounded-xl px-3 py-2">
-                    <span class="text-xs font-semibold text-gray-700">{{ area }}</span>
-                    <p class="text-[11px] text-gray-500 mt-0.5 leading-snug">{{ advice }}</p>
+                {% for area, info in pred.life_areas.items() %}
+                <div class="rounded-xl px-3 py-2
+                    {% if info.outlook == 'very_favorable' %}bg-emerald-50
+                    {% elif info.outlook == 'favorable' %}bg-green-50/60
+                    {% elif info.outlook == 'mixed' %}bg-amber-50/60
+                    {% elif info.outlook == 'challenging' %}bg-orange-50/60
+                    {% else %}bg-red-50/60{% endif %}">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-semibold
+                            {% if info.outlook in ('very_favorable', 'favorable') %}text-emerald-800
+                            {% elif info.outlook == 'mixed' %}text-amber-800
+                            {% else %}text-red-800{% endif %}">{{ area }}</span>
+                        {% if info.houses %}<span class="text-[9px] text-gray-400">H{{ info.houses | join(',') }}</span>{% endif %}
+                    </div>
+                    <p class="text-[11px] text-gray-600 mt-0.5 leading-snug">{{ info.details }}</p>
                 </div>
                 {% endfor %}
             </div>

@@ -501,8 +501,10 @@ def print_predictions(chart: Chart, predictions: list[dict],
 
         # Period header
         console.print(f"[bold]━━━ {pred['period']} ━━━[/bold]")
+        score_val = pred['score']
+        score_str = f"{score_val:+.1f}" if isinstance(score_val, float) else f"{score_val:+d}"
         console.print(f"  Dasha: [bold cyan]{pred['dasha']}[/bold cyan]  |  "
-                      f"Outlook: [{color}]{pred['outlook']}[/{color}] (score: {pred['score']:+d})")
+                      f"Outlook: [{color}]{pred['outlook']}[/{color}] (score: {score_str})")
 
         # Analysis points
         if pred["analysis"]:
@@ -517,8 +519,22 @@ def print_predictions(chart: Chart, predictions: list[dict],
                 else:
                     console.print(f"  ● {line}")
 
+        # Yoga activations
+        if pred.get("yogas_active"):
+            console.print()
+            for yoga in pred["yogas_active"]:
+                console.print(f"  [bold yellow]✦ {yoga}[/bold yellow]")
+
         # Life area predictions
         if pred["life_areas"]:
             console.print()
-            for area, advice in pred["life_areas"].items():
-                console.print(f"  [bold]{area}:[/bold] {advice}")
+            for area, info in pred["life_areas"].items():
+                if isinstance(info, dict):
+                    details = info.get("details", "")
+                    outlook = info.get("outlook", "")
+                    area_color = {"very_favorable": "green", "favorable": "green",
+                                  "mixed": "yellow", "challenging": "red",
+                                  "difficult": "bold red"}.get(outlook, "white")
+                    console.print(f"  [bold]{area}:[/bold] [{area_color}]{details}[/{area_color}]")
+                else:
+                    console.print(f"  [bold]{area}:[/bold] {info}")

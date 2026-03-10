@@ -53,6 +53,19 @@ def api_predict(body: PredictInput):
 
     pred_data = []
     for pred in predictions:
+        # Flatten life_areas for API/template consumption
+        life_areas_flat = {}
+        for area_name, area_info in pred["life_areas"].items():
+            if isinstance(area_info, dict):
+                life_areas_flat[area_name] = {
+                    "outlook": area_info.get("outlook", "mixed"),
+                    "details": area_info.get("details", ""),
+                    "score": area_info.get("score", 0),
+                    "houses": area_info.get("houses", []),
+                }
+            else:
+                life_areas_flat[area_name] = {"outlook": "mixed", "details": str(area_info)}
+
         pred_data.append({
             "period": pred["period"],
             "dasha": pred["dasha"],
@@ -60,7 +73,9 @@ def api_predict(body: PredictInput):
             "outlook_local": T(f"outlook.{pred['outlook']}"),
             "score": pred["score"],
             "analysis": pred["analysis"],
-            "life_areas": pred["life_areas"],
+            "life_areas": life_areas_flat,
+            "yogas_active": pred.get("yogas_active", []),
+            "sade_sati": pred.get("sade_sati"),
         })
 
     moon = next((p for p in chart.planets if p.name == "Moon"), None)
