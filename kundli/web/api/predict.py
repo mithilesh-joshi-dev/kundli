@@ -76,6 +76,10 @@ def api_predict(body: PredictInput):
             "life_areas": life_areas_flat,
             "yogas_active": pred.get("yogas_active", []),
             "sade_sati": pred.get("sade_sati"),
+            "bhrigu_bindu": pred.get("bhrigu_bindu"),
+            "jupiter_cycle": pred.get("jupiter_cycle"),
+            "saturn_cycle": pred.get("saturn_cycle"),
+            "varga_insights": pred.get("varga_insights", {}),
         })
 
     moon = next((p for p in chart.planets if p.name == "Moon"), None)

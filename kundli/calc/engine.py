@@ -6,7 +6,7 @@ from .utils import dms_str, longitude_to_nakshatra, longitude_to_rashi, to_julia
 
 
 def _make_position(name: str, lon: float, lagna_rashi_idx: int,
-                   is_retrograde: bool = False) -> PlanetPosition:
+                   is_retrograde: bool = False, speed: float = 0.0) -> PlanetPosition:
     rashi_idx, rashi, rashi_deg = longitude_to_rashi(lon)
     _, nakshatra, pada = longitude_to_nakshatra(lon)
     # Whole Sign house: house 1 = lagna's rashi
@@ -20,6 +20,7 @@ def _make_position(name: str, lon: float, lagna_rashi_idx: int,
         nakshatra_pada=pada,
         house=house,
         is_retrograde=is_retrograde,
+        speed=speed,
     )
 
 
@@ -65,7 +66,7 @@ def calculate_chart(birth: BirthData) -> Chart:
             # Rahu is always retrograde in mean node
             is_retro = True
 
-        planets.append(_make_position(name, lon, lagna_rashi_idx, is_retro))
+        planets.append(_make_position(name, lon, lagna_rashi_idx, is_retro, speed))
 
     # Ketu = Rahu + 180
     ketu_lon = (rahu_lon + 180) % 360

@@ -107,6 +107,35 @@
             </div>
             {% endif %}
 
+            {% if pred.bhrigu_bindu %}
+            <div class="bg-violet-50 rounded-xl px-3 py-2 mb-3 flex items-start gap-2">
+                <span class="text-violet-500 text-sm mt-0.5">⚡</span>
+                <div>
+                    <span class="text-[10px] font-bold text-violet-800 uppercase tracking-wider">Bhrigu Bindu</span>
+                    <p class="text-[11px] text-violet-700 mt-0.5">
+                        Activated by {{ pred.bhrigu_bindu.activated_by | join(', ') }}
+                        at {{ pred.bhrigu_bindu.degree }} {{ pred.bhrigu_bindu.rashi }} (H{{ pred.bhrigu_bindu.house }})
+                        — significant life event period
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pred.jupiter_cycle and pred.jupiter_cycle.summary %}
+            <div class="flex gap-2 mb-2">
+                <div class="flex-1 bg-yellow-50/50 rounded-lg px-2.5 py-1.5">
+                    <span class="text-[9px] font-bold text-yellow-700 uppercase">Jupiter H{{ pred.jupiter_cycle.house }}</span>
+                    <p class="text-[10px] text-gray-600 mt-0.5">{{ pred.jupiter_cycle.summary }}</p>
+                </div>
+                {% if pred.saturn_cycle and pred.saturn_cycle.summary %}
+                <div class="flex-1 bg-blue-50/50 rounded-lg px-2.5 py-1.5">
+                    <span class="text-[9px] font-bold text-blue-700 uppercase">Saturn H{{ pred.saturn_cycle.house }}</span>
+                    <p class="text-[10px] text-gray-600 mt-0.5">{{ pred.saturn_cycle.summary }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
             {% if pred.life_areas %}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {% for area, info in pred.life_areas.items() %}
