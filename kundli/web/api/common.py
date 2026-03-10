@@ -76,7 +76,7 @@ def parse_birth(b: BirthInput) -> BirthData:
     """Parse BirthInput into BirthData, resolving place if needed."""
     lat, lon, utc_offset = b.lat, b.lon, b.utc_offset
 
-    if b.place:
+    if b.place and lat is None and lon is None:
         result = lookup_city(b.place)
         if result:
             lat, lon, utc_offset = result

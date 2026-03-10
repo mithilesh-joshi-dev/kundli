@@ -35,6 +35,14 @@ class ServerConfig:
 
 
 @dataclass(frozen=True)
+class FeaturesConfig:
+    """Feature flags — toggle UI features on/off via env vars."""
+    predict: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_PREDICT", False))
+    transit: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_TRANSIT", True))
+    matching: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_MATCHING", True))
+
+
+@dataclass(frozen=True)
 class AppConfig:
     debug: bool = field(default_factory=lambda: _env_bool("KUNDLI_DEBUG", False))
     default_lang: str = field(default_factory=lambda: _env("KUNDLI_DEFAULT_LANG", "mr"))
@@ -54,6 +62,7 @@ class LimitsConfig:
 class Settings:
     server: ServerConfig = field(default_factory=ServerConfig)
     app: AppConfig = field(default_factory=AppConfig)
+    features: FeaturesConfig = field(default_factory=FeaturesConfig)
     limits: LimitsConfig = field(default_factory=LimitsConfig)
 
 

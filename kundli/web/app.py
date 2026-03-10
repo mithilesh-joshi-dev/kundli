@@ -4,9 +4,9 @@ import logging
 import time
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -54,15 +54,20 @@ def create_app() -> FastAPI:
     async def global_exception_handler(request: Request, exc: Exception):
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
         if _is_htmx(request):
-            return JSONResponse(
-                status_code=500,
-                content={"detail": "Internal server error"},
-                headers={"Content-Type": "text/html"},
-            )
+            return _htmx_error_response("Something went wrong. Please try again.", 500)
         return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException):
+        if _is_htmx(request):
+            detail = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
+            return _htmx_error_response(detail, exc.status_code)
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
     @app.exception_handler(ValueError)
     async def value_error_handler(request: Request, exc: ValueError):
+        if _is_htmx(request):
+            return _htmx_error_response(str(exc), 400)
         return JSONResponse(status_code=400, content={"detail": str(exc)})
 
     # --- Templates & Static ---
@@ -92,6 +97,22 @@ def create_app() -> FastAPI:
 
 def _is_htmx(request: Request) -> bool:
     return request.headers.get("HX-Request") == "true"
+
+
+def _htmx_error_response(message: str, status_code: int) -> HTMLResponse:
+    """Return a styled HTML error fragment for HTMX requests."""
+    from html import escape
+    safe_msg = escape(message)
+    html = (
+        '<div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">'
+        '<span class="text-red-500 text-lg leading-none mt-0.5">⚠</span>'
+        '<div>'
+        '<p class="text-sm font-medium text-red-800">Error</p>'
+        f'<p class="text-sm text-red-600 mt-0.5">{safe_msg}</p>'
+        '</div>'
+        '</div>'
+    )
+    return HTMLResponse(content=html, status_code=status_code)
 
 
 app = create_app()

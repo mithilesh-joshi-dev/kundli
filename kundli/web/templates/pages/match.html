@@ -17,17 +17,40 @@
                 <h3 class="font-semibold text-pink-700 text-sm">{{ T("ui.bride") }}</h3>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
-                <input type="date" name="bride_date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+                <label for="bride-date" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
+                <input type="date" name="bride_date" id="bride-date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
-                <input type="time" name="bride_time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+                <label for="bride-time" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
+                <input type="time" name="bride_time" id="bride-time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
-                <input type="text" name="bride_place" placeholder="Pune, Mumbai..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+            <div class="relative" id="place-wrapper-bride">
+                <label for="place-input-bride" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
+                <input type="text" name="bride_place" id="place-input-bride"
+                       placeholder="{{ T('ui.place_placeholder') }}" autocomplete="off"
+                       class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+                <div id="place-dropdown-bride" class="hidden absolute z-50 left-0 right-0 w-full top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60"></div>
             </div>
+            <details class="group">
+                <summary class="inline-flex items-center gap-1 text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition">
+                    <svg class="w-3 h-3 chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    {{ T("ui.or_coordinates") }}
+                </summary>
+                <div class="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-dashed border-gray-200">
+                    <div>
+                        <label for="lat-bride" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.latitude") }}</label>
+                        <input type="number" step="0.0001" name="bride_lat" id="lat-bride" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 outline-none">
+                    </div>
+                    <div>
+                        <label for="lon-bride" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.longitude") }}</label>
+                        <input type="number" step="0.0001" name="bride_lon" id="lon-bride" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 outline-none">
+                    </div>
+                    <div>
+                        <label for="utc-bride" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.utc_offset") }}</label>
+                        <input type="number" step="0.5" name="bride_utc_offset" id="utc-bride" value="5.5" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 outline-none">
+                    </div>
+                </div>
+            </details>
         </div>
 
         <!-- Groom -->
@@ -37,17 +60,40 @@
                 <h3 class="font-semibold text-blue-700 text-sm">{{ T("ui.groom") }}</h3>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
-                <input type="date" name="groom_date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+                <label for="groom-date" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
+                <input type="date" name="groom_date" id="groom-date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
-                <input type="time" name="groom_time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+                <label for="groom-time" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
+                <input type="time" name="groom_time" id="groom-time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
-                <input type="text" name="groom_place" placeholder="Delhi, Nagpur..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+            <div class="relative" id="place-wrapper-groom">
+                <label for="place-input-groom" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
+                <input type="text" name="groom_place" id="place-input-groom"
+                       placeholder="{{ T('ui.place_placeholder') }}" autocomplete="off"
+                       class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+                <div id="place-dropdown-groom" class="hidden absolute z-50 left-0 right-0 w-full top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60"></div>
             </div>
+            <details class="group">
+                <summary class="inline-flex items-center gap-1 text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition">
+                    <svg class="w-3 h-3 chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    {{ T("ui.or_coordinates") }}
+                </summary>
+                <div class="grid grid-cols-3 gap-3 mt-2 pt-2 border-t border-dashed border-gray-200">
+                    <div>
+                        <label for="lat-groom" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.latitude") }}</label>
+                        <input type="number" step="0.0001" name="groom_lat" id="lat-groom" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 outline-none">
+                    </div>
+                    <div>
+                        <label for="lon-groom" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.longitude") }}</label>
+                        <input type="number" step="0.0001" name="groom_lon" id="lon-groom" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 outline-none">
+                    </div>
+                    <div>
+                        <label for="utc-groom" class="block text-[10px] text-gray-400 mb-0.5">{{ T("ui.utc_offset") }}</label>
+                        <input type="number" step="0.5" name="groom_utc_offset" id="utc-groom" value="5.5" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 outline-none">
+                    </div>
+                </div>
+            </details>
         </div>
     </div>
 
@@ -64,4 +110,123 @@
 </form>
 
 <div id="results" class="htmx-hide-on-request"></div>
+
+<script>
+function initPlaceAutocomplete(prefix) {
+    var wrapper = document.getElementById('place-wrapper-' + prefix);
+    var input = document.getElementById('place-input-' + prefix);
+    var dropdown = document.getElementById('place-dropdown-' + prefix);
+    var latInput = document.getElementById('lat-' + prefix);
+    var lonInput = document.getElementById('lon-' + prefix);
+    var utcInput = document.getElementById('utc-' + prefix);
+    var debounceTimer = null;
+    var activeIndex = -1;
+
+    input.addEventListener('input', function() {
+        var q = this.value.trim();
+        clearTimeout(debounceTimer);
+        latInput.value = '';
+        lonInput.value = '';
+        if (q.length < 2) { hideDropdown(); return; }
+        debounceTimer = setTimeout(function() { fetchSuggestions(q); }, 300);
+    });
+
+    input.addEventListener('keydown', function(e) {
+        var items = dropdown.querySelectorAll('[data-place-item]');
+        if (!items.length) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = Math.min(activeIndex + 1, items.length - 1);
+            highlightItem(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = Math.max(activeIndex - 1, 0);
+            highlightItem(items);
+        } else if (e.key === 'Enter' && activeIndex >= 0) {
+            e.preventDefault();
+            items[activeIndex].click();
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+
+    // Close dropdown when focus leaves the wrapper
+    wrapper.addEventListener('focusout', function(e) {
+        setTimeout(function() {
+            if (!wrapper.contains(document.activeElement)) {
+                hideDropdown();
+            }
+        }, 150);
+    });
+
+    function fetchSuggestions(q) {
+        fetch('/api/geocode/suggest?q=' + encodeURIComponent(q))
+            .then(function(r) {
+                if (!r.ok) throw new Error('API error');
+                return r.json();
+            })
+            .then(function(data) {
+                renderDropdown(data.results || []);
+            })
+            .catch(function() {
+                dropdown.innerHTML = '<div class="px-3 py-2.5 text-xs text-red-400">{{ T("ui.no_results") }}</div>';
+                dropdown.classList.remove('hidden');
+            });
+    }
+
+    function renderDropdown(results) {
+        if (!results.length) {
+            dropdown.innerHTML = '<div class="px-3 py-2.5 text-xs text-gray-400">{{ T("ui.no_results") }}</div>';
+            dropdown.classList.remove('hidden');
+            return;
+        }
+        activeIndex = -1;
+        dropdown.innerHTML = results.map(function(r, i) {
+            var label = r.district
+                ? r.name + ', ' + r.district + ', ' + r.state
+                : r.state ? r.name + ', ' + r.state : r.name;
+            return '<button type="button" data-place-item data-idx="' + i + '" '
+                + 'data-name="' + escHtml(r.name) + '" '
+                + 'data-lat="' + Number(r.lat) + '" data-lon="' + Number(r.lon) + '" '
+                + 'data-utc="' + Number(r.utc_offset || 5.5) + '" '
+                + 'class="w-full text-left px-3 py-2 hover:bg-saffron-50 transition flex items-start gap-2 border-b border-gray-50 last:border-0">'
+                + '<span class="text-saffron-500 text-xs mt-0.5">📍</span>'
+                + '<span class="text-sm text-gray-700">' + escHtml(label) + '</span>'
+                + '</button>';
+        }).join('');
+        dropdown.classList.remove('hidden');
+
+        dropdown.querySelectorAll('[data-place-item]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                input.value = this.dataset.name;
+                latInput.value = this.dataset.lat;
+                lonInput.value = this.dataset.lon;
+                utcInput.value = this.dataset.utc;
+                hideDropdown();
+            });
+        });
+    }
+
+    function highlightItem(items) {
+        items.forEach(function(item, i) {
+            item.classList.toggle('bg-saffron-50', i === activeIndex);
+        });
+    }
+
+    function hideDropdown() {
+        dropdown.classList.add('hidden');
+        dropdown.innerHTML = '';
+        activeIndex = -1;
+    }
+
+    function escHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+}
+
+initPlaceAutocomplete('bride');
+initPlaceAutocomplete('groom');
+</script>
 {% endblock %}

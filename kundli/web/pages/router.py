@@ -69,6 +69,7 @@ def _ctx(request: Request, page: str = "home", **kwargs):
         "T": T,
         "page": page,
         "languages": SUPPORTED_LANGUAGES,
+        "features": settings.features,
         **kwargs,
     }
 
@@ -198,11 +199,17 @@ async def match_results(request: Request):
     bride = BirthInput(
         date=form["bride_date"], time=form["bride_time"],
         place=form.get("bride_place") or None,
+        lat=float(form["bride_lat"]) if form.get("bride_lat") else None,
+        lon=float(form["bride_lon"]) if form.get("bride_lon") else None,
+        utc_offset=float(form.get("bride_utc_offset", 5.5)),
         lang=lang,
     )
     groom = BirthInput(
         date=form["groom_date"], time=form["groom_time"],
         place=form.get("groom_place") or None,
+        lat=float(form["groom_lat"]) if form.get("groom_lat") else None,
+        lon=float(form["groom_lon"]) if form.get("groom_lon") else None,
+        utc_offset=float(form.get("groom_utc_offset", 5.5)),
         lang=lang,
     )
     body = MatchInput(bride=bride, groom=groom, lang=lang)

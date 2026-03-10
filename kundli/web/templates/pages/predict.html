@@ -14,12 +14,12 @@
     <div class="grid grid-cols-2 gap-3 mt-3 max-w-xs">
         <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.start_year") }}</label>
-            <input type="number" name="start_year" value="2025"
+            <input type="number" name="start_year" value="2026" min="1900" max="2100"
                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-saffron-400/50 focus:border-saffron-400 transition outline-none">
         </div>
         <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.end_year") }}</label>
-            <input type="number" name="end_year" value="2027"
+            <input type="number" name="end_year" value="2028" min="1900" max="2100"
                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-saffron-400/50 focus:border-saffron-400 transition outline-none">
         </div>
     </div>
