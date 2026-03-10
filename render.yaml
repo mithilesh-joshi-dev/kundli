@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kundli
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: KUNDLI_HOST
+        value: 0.0.0.0
+      - key: KUNDLI_PORT
+        value: 8000
+      - key: KUNDLI_WORKERS
+        value: 2
+      - key: KUNDLI_LOG_LEVEL
+        value: info
+      - key: KUNDLI_DEFAULT_LANG
+        value: mr

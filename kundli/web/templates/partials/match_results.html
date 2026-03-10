@@ -1,0 +1,78 @@
+<!-- Matching results partial -->
+
+<!-- Bride & Groom Moon -->
+<div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl border border-pink-100 p-4 mb-5">
+    <div class="flex flex-wrap gap-4 text-sm">
+        <div>
+            <span class="text-pink-400 text-xs">{{ T("ui.bride") }} — {{ T("planet.Moon") }}</span>
+            <div class="font-semibold text-pink-800">{{ data.bride_moon }}</div>
+        </div>
+        <div class="border-l border-pink-200 pl-4">
+            <span class="text-blue-400 text-xs">{{ T("ui.groom") }} — {{ T("planet.Moon") }}</span>
+            <div class="font-semibold text-blue-800">{{ data.groom_moon }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Score Card (big) -->
+<div class="rounded-2xl border-2 p-6 text-center mb-5
+    {% if data.percentage >= 60 %}border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50
+    {% elif data.percentage >= 50 %}border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50
+    {% elif data.percentage >= 40 %}border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50
+    {% else %}border-red-200 bg-gradient-to-br from-red-50 to-orange-50{% endif %}">
+    <div class="text-4xl font-bold mb-1
+        {% if data.percentage >= 60 %}text-emerald-700
+        {% elif data.percentage >= 50 %}text-amber-700
+        {% elif data.percentage >= 40 %}text-orange-700
+        {% else %}text-red-700{% endif %}">
+        {{ data.total }}/{{ data.max_total }}
+    </div>
+    <div class="text-lg font-semibold
+        {% if data.percentage >= 60 %}text-emerald-600
+        {% elif data.percentage >= 50 %}text-amber-600
+        {% elif data.percentage >= 40 %}text-orange-600
+        {% else %}text-red-600{% endif %}">
+        {{ data.percentage }}%
+    </div>
+    <p class="text-sm mt-2 max-w-sm mx-auto
+        {% if data.percentage >= 60 %}text-emerald-700/70
+        {% elif data.percentage >= 50 %}text-amber-700/70
+        {% elif data.percentage >= 40 %}text-orange-700/70
+        {% else %}text-red-700/70{% endif %}">
+        {% if data.percentage >= 60 %}Excellent match! Marriage is recommended.
+        {% elif data.percentage >= 50 %}Good match. Marriage is acceptable with some adjustments.
+        {% elif data.percentage >= 40 %}Average match. Consider carefully, remedies may be needed.
+        {% else %}Below average. Marriage not recommended without significant remedies.{% endif %}
+    </p>
+</div>
+
+<!-- Koota Details -->
+<div class="bg-white rounded-2xl border border-gray-100 p-4">
+    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Koota Details</h3>
+    <div class="space-y-2">
+        {% for k in data.kootas %}
+        <div class="flex items-center gap-3 py-1.5 {% if not loop.last %}border-b border-gray-50{% endif %}">
+            <span class="font-semibold text-sm text-gray-700 w-24 shrink-0">{{ k.name }}</span>
+            <!-- Score bar -->
+            <div class="flex-1">
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                        <div class="h-full rounded-full transition-all
+                            {% if k.score == k.max_score %}bg-emerald-400
+                            {% elif k.score >= k.max_score / 2 %}bg-amber-400
+                            {% else %}bg-red-400{% endif %}"
+                            style="width: {{ (k.score / k.max_score * 100) | int }}%"></div>
+                    </div>
+                    <span class="text-xs font-bold w-10 text-right
+                        {% if k.score == k.max_score %}text-emerald-600
+                        {% elif k.score >= k.max_score / 2 %}text-amber-600
+                        {% else %}text-red-600{% endif %}">
+                        {{ k.score }}/{{ k.max_score }}
+                    </span>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-0.5">{{ k.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

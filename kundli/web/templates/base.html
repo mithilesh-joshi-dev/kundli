@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ T("ui.app_title") }}</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    saffron: { 50:'#fff8f0', 100:'#ffedd5', 200:'#fed7aa', 300:'#fdba74', 400:'#fb923c', 500:'#f97316', 600:'#ea580c', 700:'#c2410c', 800:'#9a3412', 900:'#7c2d12' },
+                    temple: { 50:'#fefce8', 100:'#fef9c3', 200:'#fef08a', 300:'#fde047', 400:'#facc15', 500:'#eab308' },
+                },
+                fontFamily: {
+                    sans: ['Inter', 'Noto Sans Devanagari', 'system-ui', 'sans-serif'],
+                    devanagari: ['Noto Sans Devanagari', 'sans-serif'],
+                }
+            }
+        }
+    }
+    </script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif; }
+
+        /* HTMX states */
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: flex; }
+        .htmx-request .htmx-hide-on-request { opacity: 0.4; pointer-events: none; }
+
+        /* Loading spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { animation: spin 0.8s linear infinite; }
+
+        /* Outlook badges */
+        .outlook-very-favorable { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
+        .outlook-favorable { background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
+        .outlook-mixed { background: linear-gradient(135deg, #fefce8, #fef9c3); }
+        .outlook-challenging { background: linear-gradient(135deg, #fff7ed, #ffedd5); }
+        .outlook-difficult { background: linear-gradient(135deg, #fef2f2, #fecaca); }
+
+        /* Smooth scroll on mobile */
+        .scroll-snap { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .scroll-snap > * { scroll-snap-align: start; }
+
+        /* Bottom nav active indicator */
+        .bnav-active { color: #ea580c; }
+        .bnav-active::after {
+            content: '';
+            display: block;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: #ea580c;
+            margin: 2px auto 0;
+        }
+
+        /* Card hover lift */
+        .card-lift { transition: transform 0.2s, box-shadow 0.2s; }
+        .card-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
+        @media (max-width: 640px) { .card-lift:hover { transform: none; } }
+
+        /* Details marker */
+        details summary::-webkit-details-marker { display: none; }
+        details summary { list-style: none; }
+        details[open] .chevron { transform: rotate(180deg); }
+        .chevron { transition: transform 0.2s; }
+
+        /* Table striping on mobile */
+        @media (max-width: 640px) {
+            .mobile-card-table tr { display: flex; flex-wrap: wrap; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+            .mobile-card-table td, .mobile-card-table th { border: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50/40 via-white to-amber-50/30 min-h-screen pb-20 md:pb-0">
+
+    <!-- Desktop Top Nav -->
+    <nav class="hidden md:block bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+            <a href="/?lang={{ lang }}" class="flex items-center gap-2 group">
+                <span class="text-2xl">🙏</span>
+                <span class="font-bold text-lg text-saffron-800 group-hover:text-saffron-600 transition">{{ T("ui.app_title") }}</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <div class="flex gap-1">
+                    {% set nav_items = [("chart", "ui.chart"), ("predict", "ui.predictions"), ("transit", "ui.transit"), ("match", "ui.matching")] %}
+                    {% for path, key in nav_items %}
+                    <a href="/{{ path }}?lang={{ lang }}"
+                       class="px-3 py-1.5 rounded-lg text-sm font-medium transition
+                              {% if page == path %}bg-saffron-100 text-saffron-800{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
+                        {{ T(key) }}
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+                    {% for code, name in languages.items() %}
+                    <button onclick="switchLang('{{ code }}')"
+                            class="px-2.5 py-1 text-xs font-medium rounded-md transition
+                                   {% if code == lang %}bg-white shadow text-saffron-700{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                        {{ name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Top Bar -->
+    <header class="md:hidden bg-white/90 backdrop-blur-md border-b border-orange-100 sticky top-0 z-50">
+        <div class="px-4 h-12 flex items-center justify-between">
+            <a href="/?lang={{ lang }}" class="flex items-center gap-1.5">
+                <span class="text-xl">🙏</span>
+                <span class="font-bold text-saffron-800 text-base">{{ T("ui.app_title") }}</span>
+            </a>
+            <div class="flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5">
+                {% for code, name in languages.items() %}
+                <button onclick="switchLang('{{ code }}')"
+                        class="px-2 py-0.5 text-[11px] font-medium rounded transition
+                               {% if code == lang %}bg-white shadow text-saffron-700{% else %}text-gray-400{% endif %}">
+                    {% if code == 'mr' %}मरा{% elif code == 'hi' %}हिं{% else %}En{% endif %}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 safe-area-bottom">
+        <div class="grid grid-cols-5 h-14">
+            {% set mobile_nav = [("home", "/", "ui.home", "🏠"), ("chart", "/chart", "ui.chart", "🪐"), ("predict", "/predict", "ui.predictions", "⭐"), ("transit", "/transit", "ui.transit", "🌙"), ("match", "/match", "ui.matching", "❤️")] %}
+            {% for id, path, key, icon in mobile_nav %}
+            <a href="{{ path }}?lang={{ lang }}"
+               class="flex flex-col items-center justify-center text-[10px] font-medium transition
+                      {% if page == id %}bnav-active{% else %}text-gray-400{% endif %}">
+                <span class="text-lg leading-none mb-0.5">{{ icon }}</span>
+                {{ T(key) }}
+            </a>
+            {% endfor %}
+        </div>
+    </nav>
+
+    <!-- Desktop Footer -->
+    <footer class="hidden md:block text-center text-gray-400 text-xs py-6 border-t border-gray-100 mt-8">
+        {{ T("ui.app_title") }} &middot; Lahiri Ayanamsha &middot; Whole Sign Houses
+    </footer>
+
+    <script>
+    function switchLang(lang) {
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        window.location.href = url.toString();
+    }
+
+    // Inject lang into all HTMX submissions
+    document.addEventListener('htmx:configRequest', function(event) {
+        const url = new URL(window.location);
+        const lang = url.searchParams.get('lang') || '{{ lang }}';
+        if (event.detail.parameters) {
+            event.detail.parameters['lang'] = lang;
+        }
+    });
+
+    // Smooth scroll results into view after HTMX swap
+    document.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'results') {
+            event.detail.target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+    </script>
+</body>
+</html>

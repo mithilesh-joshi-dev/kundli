@@ -7,10 +7,14 @@ dependencies = [
     "pyswisseph>=2.10",
     "typer>=0.9",
     "rich>=13.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "jinja2>=3.1",
 ]
 
 [project.scripts]
 kundli = "kundli.cli:app"
+kundli-web = "kundli.web.app:main"
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="text-xl md:text-2xl font-bold text-gray-900">{{ T("ui.chart") }}</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ T("ui.chart_desc") }}</p>
+</div>
+
+<form hx-post="/pages/chart/results" hx-target="#results" hx-swap="innerHTML"
+      hx-indicator="#loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6 mb-6">
+    {% set form_id = "chart" %}
+    {% include "partials/birth_form.html" %}
+
+    <div class="mt-4 flex items-center gap-3">
+        <button type="submit"
+                class="bg-gradient-to-r from-saffron-500 to-amber-500 hover:from-saffron-600 hover:to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-orange-200/50 transition active:scale-95 text-sm">
+            {{ T("ui.generate") }}
+        </button>
+        <div id="loading" class="htmx-indicator flex items-center gap-2 text-saffron-600 text-sm">
+            <svg class="w-4 h-4 spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ T("ui.loading") }}
+        </div>
+    </div>
+</form>
+
+<div id="results" class="htmx-hide-on-request"></div>
+{% endblock %}

@@ -1,0 +1,19 @@
+services:
+  kundli:
+    build: .
+    ports:
+      - "${KUNDLI_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      - KUNDLI_HOST=0.0.0.0
+      - KUNDLI_PORT=8000
+      - KUNDLI_RELOAD=false
+      - KUNDLI_WORKERS=2
+      - KUNDLI_LOG_LEVEL=info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

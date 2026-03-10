@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="text-xl md:text-2xl font-bold text-gray-900">{{ T("ui.matching") }}</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ T("ui.match_desc") }}</p>
+</div>
+
+<form hx-post="/pages/match/results" hx-target="#results" hx-swap="innerHTML"
+      hx-indicator="#loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6 mb-6">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <!-- Bride -->
+        <div class="space-y-3">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-sm">👰</span>
+                <h3 class="font-semibold text-pink-700 text-sm">{{ T("ui.bride") }}</h3>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
+                <input type="date" name="bride_date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
+                <input type="time" name="bride_time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
+                <input type="text" name="bride_place" placeholder="Pune, Mumbai..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 transition outline-none">
+            </div>
+        </div>
+
+        <!-- Groom -->
+        <div class="space-y-3">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-sm">🤵</span>
+                <h3 class="font-semibold text-blue-700 text-sm">{{ T("ui.groom") }}</h3>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_date") }}</label>
+                <input type="date" name="groom_date" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_time") }}</label>
+                <input type="time" name="groom_time" step="1" required class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.birth_place") }}</label>
+                <input type="text" name="groom_place" placeholder="Delhi, Nagpur..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition outline-none">
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 flex items-center gap-3">
+        <button type="submit"
+                class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-pink-200/50 transition active:scale-95 text-sm">
+            {{ T("ui.generate") }}
+        </button>
+        <div id="loading" class="htmx-indicator flex items-center gap-2 text-pink-600 text-sm">
+            <svg class="w-4 h-4 spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ T("ui.loading") }}
+        </div>
+    </div>
+</form>
+
+<div id="results" class="htmx-hide-on-request"></div>
+{% endblock %}

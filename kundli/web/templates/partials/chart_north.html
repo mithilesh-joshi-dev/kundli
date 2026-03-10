@@ -1,0 +1,59 @@
+<!-- North Indian Kundli Chart (Diamond/House-centric) — SVG -->
+<svg viewBox="0 0 300 300" class="w-full max-w-[420px] mx-auto" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .house-poly { fill: transparent; stroke: none; cursor: pointer; }
+      .house-poly:hover ~ .house-bg { fill: #fff7ed; }
+      .rashi-lbl { font-size: 7.5px; fill: #9ca3af; font-family: 'Noto Sans Devanagari', 'Inter', sans-serif; }
+      .house-no { font-size: 6.5px; fill: #d1d5db; font-family: 'Inter', sans-serif; }
+      .planet-lbl { font-size: 7.5px; fill: #1e3a5f; font-weight: 600; font-family: 'Noto Sans Devanagari', 'Inter', sans-serif; }
+      .planet-retro { fill: #dc2626; }
+      .chart-ln { stroke: #e5e7eb; stroke-width: 1.2; }
+      .chart-border { stroke: #d1d5db; stroke-width: 1.8; fill: white; }
+      .lagna-fill { fill: #fff7ed; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="300" height="300" class="chart-border" rx="4"/>
+
+  <!-- Lagna house highlight -->
+  <polygon points="{{ houses_data[0].points }}" class="lagna-fill"/>
+
+  <!-- Diamond lines -->
+  <line x1="150" y1="0" x2="300" y2="150" class="chart-ln"/>
+  <line x1="300" y1="150" x2="150" y2="300" class="chart-ln"/>
+  <line x1="150" y1="300" x2="0" y2="150" class="chart-ln"/>
+  <line x1="0" y1="150" x2="150" y2="0" class="chart-ln"/>
+
+  <!-- Corner lines -->
+  <line x1="0" y1="0" x2="75" y2="75" class="chart-ln"/>
+  <line x1="300" y1="0" x2="225" y2="75" class="chart-ln"/>
+  <line x1="300" y1="300" x2="225" y2="225" class="chart-ln"/>
+  <line x1="0" y1="300" x2="75" y2="225" class="chart-ln"/>
+
+  <!-- Inner X -->
+  <line x1="75" y1="75" x2="150" y2="150" class="chart-ln"/>
+  <line x1="225" y1="75" x2="150" y2="150" class="chart-ln"/>
+  <line x1="225" y1="225" x2="150" y2="150" class="chart-ln"/>
+  <line x1="75" y1="225" x2="150" y2="150" class="chart-ln"/>
+
+  <!-- House content -->
+  {% for h in houses_data %}
+  <g>
+    <text x="{{ h.num_x }}" y="{{ h.num_y }}" text-anchor="middle" class="house-no">{{ h.number }}</text>
+    <text x="{{ h.cx }}" y="{{ h.cy - 6 }}" text-anchor="middle" class="rashi-lbl">{{ h.rashi_local }}</text>
+    {% for p in h.planets %}
+    <text x="{{ h.cx }}" y="{{ h.cy + 5 + loop.index0 * 10 }}" text-anchor="middle"
+          class="planet-lbl {% if p.retro %}planet-retro{% endif %}">
+      {{ p.name_local }}{% if p.retro %} ℞{% endif %}
+    </text>
+    {% endfor %}
+  </g>
+  {% endfor %}
+
+  <!-- Hover polygons (on top for interaction) -->
+  {% for h in houses_data %}
+  <polygon points="{{ h.points }}" class="house-poly" fill-opacity="0"/>
+  {% endfor %}
+</svg>

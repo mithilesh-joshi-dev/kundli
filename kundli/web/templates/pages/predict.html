@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="text-xl md:text-2xl font-bold text-gray-900">{{ T("ui.predictions") }}</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ T("ui.predict_desc") }}</p>
+</div>
+
+<form hx-post="/pages/predict/results" hx-target="#results" hx-swap="innerHTML"
+      hx-indicator="#loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6 mb-6">
+    {% set form_id = "predict" %}
+    {% include "partials/birth_form.html" %}
+
+    <div class="grid grid-cols-2 gap-3 mt-3 max-w-xs">
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.start_year") }}</label>
+            <input type="number" name="start_year" value="2025"
+                   class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-saffron-400/50 focus:border-saffron-400 transition outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.end_year") }}</label>
+            <input type="number" name="end_year" value="2027"
+                   class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-saffron-400/50 focus:border-saffron-400 transition outline-none">
+        </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+        <button type="submit"
+                class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-purple-200/50 transition active:scale-95 text-sm">
+            {{ T("ui.generate") }}
+        </button>
+        <div id="loading" class="htmx-indicator flex items-center gap-2 text-purple-600 text-sm">
+            <svg class="w-4 h-4 spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ T("ui.loading") }}
+        </div>
+    </div>
+</form>
+
+<div id="results" class="htmx-hide-on-request"></div>
+{% endblock %}

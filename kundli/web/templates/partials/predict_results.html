@@ -1,0 +1,115 @@
+<!-- Prediction results partial -->
+
+<!-- Lagna + Moon summary -->
+<div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-4 mb-5">
+    <div class="flex flex-wrap gap-4 text-sm">
+        <div>
+            <span class="text-purple-400 text-xs">{{ T("planet.Lagna") }}</span>
+            <div class="font-semibold text-purple-800">{{ data.lagna.rashi_local }}</div>
+        </div>
+        <div class="border-l border-purple-200 pl-4">
+            <span class="text-purple-400 text-xs">{{ T("planet.Moon") }}</span>
+            <div class="font-semibold text-purple-800">{{ data.moon.rashi_local }} <span class="font-normal text-xs text-purple-500">({{ data.moon.nakshatra_local }})</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Ashtakavarga -->
+<details class="bg-white rounded-2xl border border-gray-100 mb-5 overflow-hidden">
+    <summary class="px-4 py-3 cursor-pointer flex justify-between items-center select-none">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ T("ui.ashtakavarga") }}</h3>
+        <svg class="w-4 h-4 text-gray-400 chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </summary>
+    <div class="px-4 pb-4 overflow-x-auto">
+        <table class="w-full text-[11px]">
+            <thead>
+                <tr class="text-[9px] uppercase tracking-wider text-gray-400 border-b border-gray-100">
+                    <th class="px-1 py-1.5 text-left font-medium">Planet</th>
+                    {% for r in data.sav.rashis %}
+                    <th class="px-1 py-1.5 text-center font-medium">{{ r.name_local[:2] }}</th>
+                    {% endfor %}
+                    <th class="px-1 py-1.5 text-center font-medium">Σ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for planet, info in data.bav.items() %}
+                <tr>
+                    <td class="px-1 py-1 font-medium text-gray-600">{{ info.planet_local }}</td>
+                    {% for b in info.bindus %}
+                    <td class="px-1 py-1 text-center font-mono
+                        {% if b >= 5 %}text-emerald-600 font-bold{% elif b <= 2 %}text-red-400{% else %}text-gray-400{% endif %}">{{ b }}</td>
+                    {% endfor %}
+                    <td class="px-1 py-1 text-center font-bold text-gray-600">{{ info.total }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="bg-gray-50/50 font-bold border-t-2 border-gray-200">
+                    <td class="px-1 py-1.5 text-gray-700">SAV</td>
+                    {% for v in data.sav["values"] %}
+                    <td class="px-1 py-1.5 text-center font-mono
+                        {% if v >= 30 %}text-emerald-600{% elif v <= 24 %}text-red-400{% else %}text-gray-500{% endif %}">{{ v }}</td>
+                    {% endfor %}
+                    <td class="px-1 py-1.5 text-center text-gray-700">{{ data.sav.total }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</details>
+
+<!-- Predictions -->
+<div class="space-y-3">
+    {% for pred in data.predictions %}
+    <div class="rounded-2xl border border-gray-100 overflow-hidden bg-white">
+        <!-- Header -->
+        <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2
+                    {% if 'Very Favorable' == pred.outlook %}bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100
+                    {% elif 'Favorable' == pred.outlook %}bg-gradient-to-r from-green-50 to-emerald-50/50 border-b border-green-100
+                    {% elif pred.outlook == 'Mixed' %}bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-amber-100
+                    {% elif pred.outlook == 'Challenging' %}bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100
+                    {% else %}bg-gradient-to-r from-red-50 to-orange-50 border-b border-red-100{% endif %}">
+            <div>
+                <span class="font-bold text-sm text-gray-800">{{ pred.period }}</span>
+                <span class="text-xs text-gray-400 ml-2">{{ pred.dasha }}</span>
+            </div>
+            <span class="inline-flex items-center gap-1 self-start px-2.5 py-1 rounded-full text-[11px] font-bold
+                {% if 'Favorable' in pred.outlook %}bg-emerald-200/60 text-emerald-800
+                {% elif pred.outlook == 'Mixed' %}bg-amber-200/60 text-amber-800
+                {% else %}bg-red-200/60 text-red-800{% endif %}">
+                {% if 'Very Favorable' == pred.outlook %}⬆⬆
+                {% elif 'Favorable' == pred.outlook %}⬆
+                {% elif pred.outlook == 'Mixed' %}↔
+                {% elif pred.outlook == 'Challenging' %}⬇
+                {% else %}⬇⬇{% endif %}
+                {{ pred.outlook_local }} ({{ pred.score }})
+            </span>
+        </div>
+
+        <!-- Body -->
+        <div class="px-4 py-3">
+            {% if pred.analysis %}
+            <div class="space-y-1 mb-3">
+                {% for line in pred.analysis %}
+                <p class="text-xs leading-relaxed
+                    {% if 'SADE SATI' in line %}text-red-600 font-semibold bg-red-50 rounded-lg px-2 py-1
+                    {% elif 'favorable' in line|lower or 'strong' in line|lower %}text-emerald-700
+                    {% elif 'challenging' in line|lower or 'weak' in line|lower or 'stressful' in line|lower %}text-red-600
+                    {% else %}text-gray-500{% endif %}">
+                    {% if 'SADE SATI' in line %}⚠️ {% endif %}{{ line }}
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if pred.life_areas %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% for area, advice in pred.life_areas.items() %}
+                <div class="bg-gray-50 rounded-xl px-3 py-2">
+                    <span class="text-xs font-semibold text-gray-700">{{ area }}</span>
+                    <p class="text-[11px] text-gray-500 mt-0.5 leading-snug">{{ advice }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

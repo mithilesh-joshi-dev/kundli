@@ -6,8 +6,9 @@ from rich.table import Table
 
 from .calc.engine import calculate_chart
 from .calc.geocode import fuzzy_search, lookup_city
+from .calc.predict import generate_predictions
 from .calc.transit import calculate_transits
-from .display.terminal import print_chart, print_matching
+from .display.terminal import print_chart, print_matching, print_predictions
 from .models import BirthData
 
 app = typer.Typer(help="Kundli - Vedic Astrology Birth Chart Generator")
@@ -148,6 +149,24 @@ def match(
     groom_chart = calculate_chart(groom_birth)
 
     print_matching(bride_chart, groom_chart)
+
+
+@app.command("predict")
+def predict(
+    date: str = typer.Option(..., help="Birth date (YYYY-MM-DD)"),
+    time: str = typer.Option(..., help="Birth time (HH:MM or HH:MM:SS)"),
+    place: Optional[str] = typer.Option(None, help="City name"),
+    lat: Optional[float] = typer.Option(None, help="Birth place latitude"),
+    lon: Optional[float] = typer.Option(None, help="Birth place longitude"),
+    utc_offset: float = typer.Option(5.5, "--utc", help="UTC offset in hours"),
+    start: int = typer.Option(2025, "--from", help="Start year"),
+    end: int = typer.Option(2027, "--to", help="End year"),
+):
+    """Predict future based on Dasha + Transit + Natal strength."""
+    birth = _parse_birth(date, time, lat, lon, place, utc_offset)
+    result = calculate_chart(birth)
+    predictions, bav, sav = generate_predictions(result, start, end)
+    print_predictions(result, predictions, bav, sav)
 
 
 @app.command("search")

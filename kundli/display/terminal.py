@@ -419,3 +419,106 @@ def print_matching(bride_chart: Chart, groom_chart: Chart) -> None:
     else:
         verdict = "[bold red]Below average match — Marriage is not recommended without significant remedies.[/bold red]"
     console.print(Panel.fit(verdict, title="Verdict"))
+
+
+def _print_ashtakavarga(bav: dict[str, list[int]], sav: list[int]) -> None:
+    """Print Ashtakavarga (BAV + SAV) table."""
+    console.print()
+    table = Table(title="Ashtakavarga (Bindu Scores per Rashi)", show_lines=True)
+    table.add_column("Planet", style="bold cyan", min_width=8)
+    for rashi in RASHIS:
+        table.add_column(rashi[:3], justify="center", min_width=4)
+    table.add_column("Total", justify="center", style="bold")
+
+    planets_order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
+    for planet in planets_order:
+        if planet not in bav:
+            continue
+        row = [planet]
+        total = sum(bav[planet])
+        for i in range(12):
+            val = bav[planet][i]
+            if val >= 5:
+                row.append(f"[green]{val}[/green]")
+            elif val <= 2:
+                row.append(f"[red]{val}[/red]")
+            else:
+                row.append(str(val))
+        row.append(str(total))
+        table.add_row(*row)
+
+    # SAV row
+    sav_row = ["[bold]SAV[/bold]"]
+    for i in range(12):
+        val = sav[i]
+        if val >= 30:
+            sav_row.append(f"[bold green]{val}[/bold green]")
+        elif val <= 24:
+            sav_row.append(f"[bold red]{val}[/bold red]")
+        else:
+            sav_row.append(f"[bold]{val}[/bold]")
+    sav_row.append(f"[bold]{sum(sav)}[/bold]")
+    table.add_row(*sav_row)
+
+    console.print(table)
+    console.print("[dim]BAV: Bindu Ashtakavarga (per planet per sign, max 8). "
+                  "SAV: Sarvashtakavarga (total, avg ~28/sign). "
+                  "Green ≥5 (strong), Red ≤2 (weak).[/dim]")
+
+
+def print_predictions(chart: Chart, predictions: list[dict],
+                      bav: dict[str, list[int]], sav: list[int]) -> None:
+    """Print future predictions report."""
+    from ..calc.constants import RASHIS
+    from ..calc.strength import RASHI_LORDS
+
+    b = chart.birth_data
+    lagna = chart.lagna
+    moon = next(p for p in chart.planets if p.name == "Moon")
+
+    console.print()
+    console.print(Panel.fit(
+        f"[bold]Vedic Prediction Report[/bold]\n"
+        f"Lagna: {lagna.rashi} | Moon: {moon.rashi} ({moon.nakshatra})\n"
+        f"Birth: {b.year}-{b.month:02d}-{b.day:02d} {b.hour:02d}:{b.minute:02d}",
+        title="Prediction Overview",
+    ))
+
+    # Ashtakavarga table
+    _print_ashtakavarga(bav, sav)
+
+    outlook_colors = {
+        "Very Favorable": "bold green",
+        "Favorable": "green",
+        "Mixed": "yellow",
+        "Challenging": "red",
+        "Difficult": "bold red",
+    }
+
+    for pred in predictions:
+        color = outlook_colors.get(pred["outlook"], "white")
+        console.print()
+
+        # Period header
+        console.print(f"[bold]━━━ {pred['period']} ━━━[/bold]")
+        console.print(f"  Dasha: [bold cyan]{pred['dasha']}[/bold cyan]  |  "
+                      f"Outlook: [{color}]{pred['outlook']}[/{color}] (score: {pred['score']:+d})")
+
+        # Analysis points
+        if pred["analysis"]:
+            console.print()
+            for line in pred["analysis"]:
+                if "SADE SATI" in line:
+                    console.print(f"  [bold red]⚠ {line}[/bold red]")
+                elif "favorable" in line.lower() or "strong" in line.lower():
+                    console.print(f"  [green]● {line}[/green]")
+                elif "challenging" in line.lower() or "weak" in line.lower() or "stressful" in line.lower():
+                    console.print(f"  [red]● {line}[/red]")
+                else:
+                    console.print(f"  ● {line}")
+
+        # Life area predictions
+        if pred["life_areas"]:
+            console.print()
+            for area, advice in pred["life_areas"].items():
+                console.print(f"  [bold]{area}:[/bold] {advice}")
