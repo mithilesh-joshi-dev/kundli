@@ -9,6 +9,7 @@ from ...calc.constants import RASHIS
 from ...calc.engine import calculate_chart
 from ...config import settings
 from ..api.common import BirthInput, parse_birth
+from ..firestore import store_request
 from ..i18n import SUPPORTED_LANGUAGES, get_translator
 
 logger = logging.getLogger("kundli.pages")
@@ -114,7 +115,9 @@ async def chart_results(request: Request):
     lang = form.get("lang", settings.app.default_lang)
     T = get_translator(lang)
 
+    person_name = form.get("name", "").strip() or None
     body = BirthInput(
+        name=person_name,
         date=form["date"], time=form["time"],
         place=form.get("place") or None,
         lat=float(form["lat"]) if form.get("lat") else None,
@@ -133,12 +136,19 @@ async def chart_results(request: Request):
     lagna_rashi_idx = int(chart.lagna.longitude / 30) % 12
     houses_data = _build_north_indian_chart(chart, lagna_rashi_idx, T)
 
+    store_request({
+        "type": "chart", "name": person_name,
+        "date": body.date, "time": body.time, "place": body.place,
+        "lat": body.lat, "lon": body.lon, "utc_offset": body.utc_offset,
+    })
+
     ctx = {
         "request": request,
         "T": T,
         "lang": lang,
         "data": data,
         "houses_data": houses_data,
+        "person_name": person_name,
     }
     return request.app.state.templates.TemplateResponse("partials/chart_results.html", ctx)
 
@@ -150,19 +160,28 @@ async def predict_results(request: Request):
     T = get_translator(lang)
 
     from ..api.predict import PredictInput, api_predict
+    person_name = form.get("name", "").strip() or None
     body = PredictInput(
+        name=person_name,
         date=form["date"], time=form["time"],
         place=form.get("place") or None,
         lat=float(form["lat"]) if form.get("lat") else None,
         lon=float(form["lon"]) if form.get("lon") else None,
         utc_offset=float(form.get("utc_offset", 5.5)),
-        start_year=int(form.get("start_year", 2025)),
-        end_year=int(form.get("end_year", 2027)),
+        start_year=int(form.get("start_year", 2026)),
+        end_year=int(form.get("end_year", 2028)),
         lang=lang,
     )
     data = api_predict(body)
 
-    ctx = {"request": request, "T": T, "lang": lang, "data": data}
+    store_request({
+        "type": "predict", "name": person_name,
+        "date": body.date, "time": body.time, "place": body.place,
+        "lat": body.lat, "lon": body.lon, "utc_offset": body.utc_offset,
+        "start_year": body.start_year, "end_year": body.end_year,
+    })
+
+    ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
     return request.app.state.templates.TemplateResponse("partials/predict_results.html", ctx)
 
 
@@ -173,19 +192,28 @@ async def transit_results(request: Request):
     T = get_translator(lang)
 
     from ..api.transit import TransitInput, api_transit
+    person_name = form.get("name", "").strip() or None
     body = TransitInput(
+        name=person_name,
         date=form["date"], time=form["time"],
         place=form.get("place") or None,
         lat=float(form["lat"]) if form.get("lat") else None,
         lon=float(form["lon"]) if form.get("lon") else None,
         utc_offset=float(form.get("utc_offset", 5.5)),
-        start_year=int(form.get("start_year", 2025)),
-        end_year=int(form.get("end_year", 2027)),
+        start_year=int(form.get("start_year", 2026)),
+        end_year=int(form.get("end_year", 2028)),
         lang=lang,
     )
     data = api_transit(body)
 
-    ctx = {"request": request, "T": T, "lang": lang, "data": data}
+    store_request({
+        "type": "transit", "name": person_name,
+        "date": body.date, "time": body.time, "place": body.place,
+        "lat": body.lat, "lon": body.lon, "utc_offset": body.utc_offset,
+        "start_year": body.start_year, "end_year": body.end_year,
+    })
+
+    ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
     return request.app.state.templates.TemplateResponse("partials/transit_results.html", ctx)
 
 
@@ -196,7 +224,10 @@ async def match_results(request: Request):
     T = get_translator(lang)
 
     from ..api.matching import MatchInput, api_matching
+    bride_name = form.get("bride_name", "").strip() or None
+    groom_name = form.get("groom_name", "").strip() or None
     bride = BirthInput(
+        name=bride_name,
         date=form["bride_date"], time=form["bride_time"],
         place=form.get("bride_place") or None,
         lat=float(form["bride_lat"]) if form.get("bride_lat") else None,
@@ -205,6 +236,7 @@ async def match_results(request: Request):
         lang=lang,
     )
     groom = BirthInput(
+        name=groom_name,
         date=form["groom_date"], time=form["groom_time"],
         place=form.get("groom_place") or None,
         lat=float(form["groom_lat"]) if form.get("groom_lat") else None,
@@ -215,5 +247,19 @@ async def match_results(request: Request):
     body = MatchInput(bride=bride, groom=groom, lang=lang)
     data = api_matching(body)
 
-    ctx = {"request": request, "T": T, "lang": lang, "data": data}
+    store_request({
+        "type": "match",
+        "bride": {
+            "name": bride_name, "date": bride.date, "time": bride.time,
+            "place": bride.place, "lat": bride.lat, "lon": bride.lon,
+            "utc_offset": bride.utc_offset,
+        },
+        "groom": {
+            "name": groom_name, "date": groom.date, "time": groom.time,
+            "place": groom.place, "lat": groom.lat, "lon": groom.lon,
+            "utc_offset": groom.utc_offset,
+        },
+    })
+
+    ctx = {"request": request, "T": T, "lang": lang, "data": data, "bride_name": bride_name, "groom_name": groom_name}
     return request.app.state.templates.TemplateResponse("partials/match_results.html", ctx)

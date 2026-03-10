@@ -59,11 +59,18 @@ class LimitsConfig:
 
 
 @dataclass(frozen=True)
+class FirestoreConfig:
+    enabled: bool = field(default_factory=lambda: _env_bool("KUNDLI_FIRESTORE_ENABLED", False))
+    collection: str = field(default_factory=lambda: _env("KUNDLI_FIRESTORE_COLLECTION", "requests"))
+
+
+@dataclass(frozen=True)
 class Settings:
     server: ServerConfig = field(default_factory=ServerConfig)
     app: AppConfig = field(default_factory=AppConfig)
     features: FeaturesConfig = field(default_factory=FeaturesConfig)
     limits: LimitsConfig = field(default_factory=LimitsConfig)
+    firestore: FirestoreConfig = field(default_factory=FirestoreConfig)
 
 
 # Singleton — import this everywhere

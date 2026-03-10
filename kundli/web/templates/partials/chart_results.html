@@ -1,5 +1,11 @@
 <!-- Chart results partial — swapped in by HTMX -->
 
+{% if person_name %}
+<div class="mb-4">
+    <h2 class="text-lg md:text-xl font-bold text-gray-800">{{ person_name }}</h2>
+</div>
+{% endif %}
+
 <!-- Birth Details + Panchang -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
     <div class="bg-white rounded-2xl border border-gray-100 p-4">

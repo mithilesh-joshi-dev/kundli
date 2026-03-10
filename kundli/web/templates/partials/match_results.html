@@ -4,12 +4,12 @@
 <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl border border-pink-100 p-4 mb-5">
     <div class="flex flex-wrap gap-4 text-sm">
         <div>
-            <span class="text-pink-400 text-xs">{{ T("ui.bride") }} — {{ T("planet.Moon") }}</span>
-            <div class="font-semibold text-pink-800">{{ data.bride_moon }}</div>
+            <span class="text-pink-400 text-xs">{{ T("ui.bride") }}{% if bride_name %} — {{ bride_name }}{% endif %}</span>
+            <div class="font-semibold text-pink-800">{{ T("planet.Moon") }}: {{ data.bride_moon }}</div>
         </div>
         <div class="border-l border-pink-200 pl-4">
-            <span class="text-blue-400 text-xs">{{ T("ui.groom") }} — {{ T("planet.Moon") }}</span>
-            <div class="font-semibold text-blue-800">{{ data.groom_moon }}</div>
+            <span class="text-blue-400 text-xs">{{ T("ui.groom") }}{% if groom_name %} — {{ groom_name }}{% endif %}</span>
+            <div class="font-semibold text-blue-800">{{ T("planet.Moon") }}: {{ data.groom_moon }}</div>
         </div>
     </div>
 </div>

@@ -9,6 +9,8 @@ TRANSLATIONS = {
     "ui.transit": "Transits",
     "ui.matching": "Matching",
     "ui.generate": "Generate",
+    "ui.name": "Name",
+    "ui.name_placeholder": "Enter full name",
     "ui.birth_date": "Birth Date",
     "ui.birth_time": "Birth Time",
     "ui.birth_place": "Birth Place",

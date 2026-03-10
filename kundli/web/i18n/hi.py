@@ -9,6 +9,8 @@ TRANSLATIONS = {
     "ui.transit": "गोचर",
     "ui.matching": "कुंडली मिलान",
     "ui.generate": "बनाएं",
+    "ui.name": "नाम",
+    "ui.name_placeholder": "पूरा नाम दर्ज करें",
     "ui.birth_date": "जन्म तिथि",
     "ui.birth_time": "जन्म समय",
     "ui.birth_place": "जन्म स्थान",

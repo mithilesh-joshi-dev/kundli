@@ -14,6 +14,7 @@ _TIME_RE = re.compile(r"^\d{2}:\d{2}(:\d{2})?$")
 
 
 class BirthInput(BaseModel):
+    name: str | None = None
     date: str
     time: str
     place: str | None = None
