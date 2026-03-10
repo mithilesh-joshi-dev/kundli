@@ -38,7 +38,7 @@ jobs:
             --cpu=1 \
             --min-instances=0 \
             --max-instances=2 \
-            --set-env-vars="KUNDLI_WORKERS=1,KUNDLI_DEFAULT_LANG=mr,KUNDLI_LOG_LEVEL=info" \
+            --set-env-vars="KUNDLI_WORKERS=1,KUNDLI_DEFAULT_LANG=mr,KUNDLI_LOG_LEVEL=info,KUNDLI_FIRESTORE_ENABLED=true" \
             --quiet
 
       - name: Show URL
