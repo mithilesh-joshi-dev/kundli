@@ -107,6 +107,13 @@ async def match_page(request: Request):
     return request.app.state.templates.TemplateResponse("pages/match.html", ctx)
 
 
+@router.get("/questions", response_class=HTMLResponse)
+async def questions_page(request: Request):
+    from ...calc.events2 import EVENTS
+    ctx = _ctx(request, "questions", events=EVENTS)
+    return request.app.state.templates.TemplateResponse("pages/questions.html", ctx)
+
+
 # === HTMX Partial Routes (return rendered HTML fragments) ===
 
 @router.post("/pages/chart/results", response_class=HTMLResponse)
@@ -159,7 +166,7 @@ async def predict_results(request: Request):
     lang = form.get("lang", settings.app.default_lang)
     T = get_translator(lang)
 
-    from ..api.predict import PredictInput, api_predict
+    from ..api.predict import PredictInput, api_predict  # uses predict2 via api
     person_name = form.get("name", "").strip() or None
     body = PredictInput(
         name=person_name,
@@ -263,3 +270,44 @@ async def match_results(request: Request):
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "bride_name": bride_name, "groom_name": groom_name}
     return request.app.state.templates.TemplateResponse("partials/match_results.html", ctx)
+
+
+@router.post("/pages/questions/results", response_class=HTMLResponse)
+async def questions_results(request: Request):
+    form = await request.form()
+    lang = form.get("lang", settings.app.default_lang)
+    T = get_translator(lang)
+
+    from ...calc.analysis import build_analysis
+    from ...calc.engine import calculate_chart
+    from ...calc.events2 import predict_event
+
+    person_name = form.get("name", "").strip() or None
+    body = BirthInput(
+        name=person_name,
+        date=form["date"], time=form["time"],
+        place=form.get("place") or None,
+        lat=float(form["lat"]) if form.get("lat") else None,
+        lon=float(form["lon"]) if form.get("lon") else None,
+        utc_offset=float(form.get("utc_offset", 5.5)),
+        lang=lang,
+    )
+    birth = parse_birth(body)
+    chart = calculate_chart(birth)
+    ana = build_analysis(chart)
+
+    event_key = form.get("event", "marriage")
+    start_year = int(form.get("start_year", 2025))
+    end_year = int(form.get("end_year", 2032))
+
+    data = predict_event(ana, event_key, start_year, end_year)
+
+    store_request({
+        "type": "event", "name": person_name, "event": event_key,
+        "date": body.date, "time": body.time, "place": body.place,
+        "lat": body.lat, "lon": body.lon, "utc_offset": body.utc_offset,
+        "start_year": start_year, "end_year": end_year,
+    })
+
+    ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
+    return request.app.state.templates.TemplateResponse("partials/event_results.html", ctx)

@@ -3,8 +3,9 @@
 from fastapi import APIRouter
 from pydantic import field_validator
 
+from ...calc.analysis import build_analysis
 from ...calc.engine import calculate_chart
-from ...calc.predict import generate_predictions
+from ...calc.predict2 import generate_predictions
 from ...config import settings
 from ..i18n import get_translator
 from .common import BirthInput, parse_birth, serialize_planet
@@ -33,7 +34,8 @@ def api_predict(body: PredictInput):
     T = get_translator(body.lang)
     birth = parse_birth(body)
     chart = calculate_chart(birth)
-    predictions, bav, sav = generate_predictions(chart, body.start_year, body.end_year)
+    ana = build_analysis(chart)
+    predictions, bav, sav = generate_predictions(ana, body.start_year, body.end_year)
 
     from ...calc.constants import RASHIS
 

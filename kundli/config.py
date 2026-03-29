@@ -40,6 +40,7 @@ class FeaturesConfig:
     predict: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_PREDICT", False))
     transit: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_TRANSIT", True))
     matching: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_MATCHING", True))
+    questions: bool = field(default_factory=lambda: _env_bool("KUNDLI_FEATURE_QUESTIONS", True))
 
 
 @dataclass(frozen=True)

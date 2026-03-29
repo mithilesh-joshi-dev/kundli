@@ -1,0 +1,118 @@
+<!-- Event timing results partial -->
+
+{% if person_name %}
+<div class="mb-4">
+    <h2 class="text-lg md:text-xl font-bold text-gray-800">{{ person_name }}</h2>
+</div>
+{% endif %}
+
+<!-- Question & Summary -->
+<div class="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-4 mb-5">
+    <h3 class="font-bold text-lg text-violet-900">{{ data.question }}</h3>
+    <div class="flex flex-wrap gap-3 mt-2 text-xs">
+        <span class="text-violet-600">{{ T("ui.houses") }}: {{ data.houses | join(', ') }}</span>
+        <span class="text-violet-600">{{ T("ui.karakas") }}: {{ data.karakas | join(', ') }}</span>
+        <span class="text-violet-500">{{ T("ui.bhrigu_bindu") }}: {{ data.bhrigu_bindu.degree }} {{ data.bhrigu_bindu.rashi }} (H{{ data.bhrigu_bindu.house }})</span>
+    </div>
+</div>
+
+<!-- Natal Analysis -->
+{% if data.natal_analysis %}
+<div class="bg-white rounded-2xl border border-gray-100 p-4 mb-5">
+    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ T("ui.natal_analysis") }}</h3>
+    <div class="space-y-1.5">
+        {% for line in data.natal_analysis %}
+        <p class="text-xs text-gray-600 leading-relaxed
+            {% if 'strong' in line|lower or 'confirms' in line|lower %}text-emerald-700
+            {% elif 'Debilitated' in line or 'delays' in line|lower or 'caution' in line|lower %}text-red-600
+            {% endif %}">
+            {{ line }}
+        </p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Best Period Highlight -->
+{% if data.best_period %}
+<div class="rounded-2xl border-2 p-5 text-center mb-5
+    {% if data.best_period.quality == 'highly_probable' %}border-emerald-300 bg-gradient-to-br from-emerald-50 to-green-50
+    {% elif data.best_period.quality == 'probable' %}border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50
+    {% else %}border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50{% endif %}">
+    <div class="text-xs font-bold uppercase tracking-wider
+        {% if data.best_period.quality == 'highly_probable' %}text-emerald-600{% else %}text-amber-600{% endif %} mb-1">
+        {{ T("ui.best_period") }}
+    </div>
+    <div class="text-3xl font-bold
+        {% if data.best_period.quality == 'highly_probable' %}text-emerald-700{% else %}text-amber-700{% endif %}">
+        {{ data.best_period.period }}
+    </div>
+    <div class="text-sm text-gray-600 mt-1">
+        {{ data.best_period.dasha }} &middot; Score: {{ data.best_period.score }}
+    </div>
+    {% if data.best_period.double_transit %}
+    <div class="inline-flex items-center gap-1 mt-2 text-[10px] bg-emerald-200 text-emerald-800 rounded-full px-3 py-1 font-bold uppercase">
+        Double Transit Active
+    </div>
+    {% endif %}
+    {% if data.best_period.bhrigu_bindu %}
+    <div class="text-xs text-violet-700 mt-1">{{ data.best_period.bhrigu_bindu }}</div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- All Windows -->
+{% if data.windows %}
+<div class="bg-white rounded-2xl border border-gray-100 p-4">
+    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ T("ui.favorable_windows") }} ({{ data.total_windows }})</h3>
+    <div class="space-y-2">
+        {% for w in data.windows %}
+        <div class="flex items-center gap-3 py-2 {% if not loop.last %}border-b border-gray-50{% endif %}">
+            <!-- Quality indicator -->
+            <div class="w-3 h-3 rounded-full shrink-0
+                {% if w.quality == 'highly_probable' %}bg-emerald-400
+                {% elif w.quality == 'probable' %}bg-amber-400
+                {% else %}bg-blue-300{% endif %}">
+            </div>
+
+            <!-- Period -->
+            <div class="flex-1">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-sm text-gray-800">{{ w.period }}</span>
+                    <span class="text-[10px] text-gray-400">{{ w.dasha }}</span>
+                    {% if w.double_transit %}
+                    <span class="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1.5 py-0.5 font-bold">DT</span>
+                    {% endif %}
+                    {% if w.bhrigu_bindu %}
+                    <span class="text-[9px] bg-violet-100 text-violet-700 rounded px-1.5 py-0.5 font-bold">BB</span>
+                    {% endif %}
+                </div>
+                <div class="text-[10px] text-gray-400 mt-0.5">
+                    {{ w.reasons | join(' · ') }}
+                </div>
+            </div>
+
+            <!-- Score -->
+            <div class="text-right shrink-0">
+                <span class="text-xs font-bold
+                    {% if w.quality == 'highly_probable' %}text-emerald-600
+                    {% elif w.quality == 'probable' %}text-amber-600
+                    {% else %}text-blue-600{% endif %}">
+                    {{ w.score }}
+                </span>
+                <div class="text-[9px] text-gray-400
+                    {% if w.quality == 'highly_probable' %}text-emerald-500
+                    {% elif w.quality == 'probable' %}text-amber-500
+                    {% else %}text-blue-400{% endif %}">
+                    {{ w.quality | replace('_', ' ') }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="bg-gray-50 rounded-2xl p-6 text-center">
+    <p class="text-sm text-gray-500">{{ T("ui.no_windows") }}</p>
+</div>
+{% endif %}

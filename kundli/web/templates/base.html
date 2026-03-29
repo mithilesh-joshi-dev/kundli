@@ -92,7 +92,7 @@
             </a>
             <div class="flex items-center gap-6">
                 <div class="flex gap-1">
-                    {% set nav_items = [("chart", "ui.chart", true), ("predict", "ui.predictions", features.predict), ("transit", "ui.transit", features.transit), ("match", "ui.matching", features.matching)] %}
+                    {% set nav_items = [("chart", "ui.chart", true), ("predict", "ui.predictions", features.predict), ("transit", "ui.transit", features.transit), ("match", "ui.matching", features.matching), ("questions", "ui.questions", features.questions)] %}
                     {% for path, key, enabled in nav_items %}
                     {% if enabled %}
                     <a href="/{{ path }}?lang={{ lang }}"
@@ -142,7 +142,7 @@
 
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 safe-area-bottom">
-        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", true), ("predict", "/predict", "ui.predictions", "⭐", features.predict), ("transit", "/transit", "ui.transit", "🌙", features.transit), ("match", "/match", "ui.matching", "❤️", features.matching)] %}
+        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", true), ("predict", "/predict", "ui.predictions", "⭐", features.predict), ("transit", "/transit", "ui.transit", "🌙", features.transit), ("match", "/match", "ui.matching", "❤️", features.matching), ("questions", "/questions", "ui.questions", "🔮", features.questions)] %}
         {% set active_nav = mobile_nav|selectattr(4)|list %}
         <div class="flex h-14">
             {% for id, path, key, icon, enabled in active_nav %}

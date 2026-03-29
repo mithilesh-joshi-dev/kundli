@@ -51,7 +51,7 @@ def calculate_chart(birth: BirthData) -> Chart:
     # Planets
     planets = []
     rahu_lon = None
-    flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+    flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
 
     for name, planet_id in PLANETS.items():
         if name == "Ketu":

@@ -30,7 +30,8 @@ def get_aspects(chart: Chart) -> list[tuple[str, str, int]]:
             aspect_distances.extend(SPECIAL_ASPECTS[planet.name])
 
         for dist in aspect_distances:
-            target_house = ((planet.house - 1 + dist) % 12) + 1
+            # dist is counted inclusively (planet's house = 1st), so offset is dist - 1
+            target_house = ((planet.house - 1 + dist - 1) % 12) + 1
             # Find planets in that house
             for other in all_bodies:
                 if other.name != planet.name and other.house == target_house:
@@ -49,7 +50,7 @@ def get_house_aspects(chart: Chart) -> dict[int, list[str]]:
             aspect_distances.extend(SPECIAL_ASPECTS[planet.name])
 
         for dist in aspect_distances:
-            target_house = ((planet.house - 1 + dist) % 12) + 1
+            target_house = ((planet.house - 1 + dist - 1) % 12) + 1
             house_aspects[target_house].append(planet.name)
 
     return house_aspects

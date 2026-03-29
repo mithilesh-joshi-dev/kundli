@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="text-xl md:text-2xl font-bold text-gray-900">{{ T("ui.questions") }}</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ T("ui.questions_desc") }}</p>
+</div>
+
+<form hx-post="/pages/questions/results" hx-target="#results" hx-swap="innerHTML"
+      hx-indicator="#loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6 mb-6">
+    {% set form_id = "questions" %}
+    {% include "partials/birth_form.html" %}
+
+    <!-- Event Selection -->
+    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+            <label for="event" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.select_question") }}</label>
+            <select name="event" id="event" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-saffron-400 focus:border-transparent">
+                <option value="marriage">{{ T("ui.q_marriage") }}</option>
+                <option value="job">{{ T("ui.q_job") }}</option>
+                <option value="job_switch">{{ T("ui.q_job_switch") }}</option>
+                <option value="property">{{ T("ui.q_property") }}</option>
+                <option value="children">{{ T("ui.q_children") }}</option>
+                <option value="wealth">{{ T("ui.q_wealth") }}</option>
+                <option value="foreign_travel">{{ T("ui.q_foreign") }}</option>
+                <option value="education">{{ T("ui.q_education") }}</option>
+                <option value="health_recovery">{{ T("ui.q_health") }}</option>
+                <option value="business_start">{{ T("ui.q_business") }}</option>
+                <option value="spiritual_growth">{{ T("ui.q_spiritual") }}</option>
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label for="start_year" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.from_year") }}</label>
+                <input type="number" name="start_year" id="start_year" value="2025" min="1900" max="2100"
+                       class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-saffron-400 focus:border-transparent">
+            </div>
+            <div>
+                <label for="end_year" class="block text-xs font-medium text-gray-500 mb-1">{{ T("ui.to_year") }}</label>
+                <input type="number" name="end_year" id="end_year" value="2032" min="1900" max="2100"
+                       class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-saffron-400 focus:border-transparent">
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+        <button type="submit"
+                class="bg-gradient-to-r from-saffron-500 to-amber-500 hover:from-saffron-600 hover:to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-orange-200/50 transition active:scale-95 text-sm">
+            {{ T("ui.find_answer") }}
+        </button>
+        <div id="loading" class="htmx-indicator flex items-center gap-2 text-saffron-600 text-sm">
+            <svg class="w-4 h-4 spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ T("ui.loading") }}
+        </div>
+    </div>
+</form>
+
+<div id="results" class="htmx-hide-on-request"></div>
+{% endblock %}
