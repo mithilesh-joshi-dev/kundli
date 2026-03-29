@@ -80,38 +80,38 @@ def _ctx(request: Request, page: str = "home", **kwargs):
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     ctx = _ctx(request, "home")
-    return request.app.state.templates.TemplateResponse("pages/home.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/home.html", context=ctx)
 
 
 @router.get("/chart", response_class=HTMLResponse)
 async def chart_page(request: Request):
     ctx = _ctx(request, "chart")
-    return request.app.state.templates.TemplateResponse("pages/chart.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/chart.html", context=ctx)
 
 
 @router.get("/predict", response_class=HTMLResponse)
 async def predict_page(request: Request):
     ctx = _ctx(request, "predict")
-    return request.app.state.templates.TemplateResponse("pages/predict.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/predict.html", context=ctx)
 
 
 @router.get("/transit", response_class=HTMLResponse)
 async def transit_page(request: Request):
     ctx = _ctx(request, "transit")
-    return request.app.state.templates.TemplateResponse("pages/transit.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/transit.html", context=ctx)
 
 
 @router.get("/match", response_class=HTMLResponse)
 async def match_page(request: Request):
     ctx = _ctx(request, "match")
-    return request.app.state.templates.TemplateResponse("pages/match.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/match.html", context=ctx)
 
 
 @router.get("/questions", response_class=HTMLResponse)
 async def questions_page(request: Request):
     from ...calc.events2 import EVENTS
     ctx = _ctx(request, "questions", events=EVENTS)
-    return request.app.state.templates.TemplateResponse("pages/questions.html", ctx)
+    return request.app.state.templates.TemplateResponse("pages/questions.html", context=ctx)
 
 
 # === HTMX Partial Routes (return rendered HTML fragments) ===
@@ -157,7 +157,7 @@ async def chart_results(request: Request):
         "houses_data": houses_data,
         "person_name": person_name,
     }
-    return request.app.state.templates.TemplateResponse("partials/chart_results.html", ctx)
+    return request.app.state.templates.TemplateResponse("partials/chart_results.html", context=ctx)
 
 
 @router.post("/pages/predict/results", response_class=HTMLResponse)
@@ -189,7 +189,7 @@ async def predict_results(request: Request):
     })
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
-    return request.app.state.templates.TemplateResponse("partials/predict_results.html", ctx)
+    return request.app.state.templates.TemplateResponse("partials/predict_results.html", context=ctx)
 
 
 @router.post("/pages/transit/results", response_class=HTMLResponse)
@@ -221,7 +221,7 @@ async def transit_results(request: Request):
     })
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
-    return request.app.state.templates.TemplateResponse("partials/transit_results.html", ctx)
+    return request.app.state.templates.TemplateResponse("partials/transit_results.html", context=ctx)
 
 
 @router.post("/pages/match/results", response_class=HTMLResponse)
@@ -269,7 +269,7 @@ async def match_results(request: Request):
     })
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "bride_name": bride_name, "groom_name": groom_name}
-    return request.app.state.templates.TemplateResponse("partials/match_results.html", ctx)
+    return request.app.state.templates.TemplateResponse("partials/match_results.html", context=ctx)
 
 
 @router.post("/pages/questions/results", response_class=HTMLResponse)
@@ -310,4 +310,4 @@ async def questions_results(request: Request):
     })
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
-    return request.app.state.templates.TemplateResponse("partials/event_results.html", ctx)
+    return request.app.state.templates.TemplateResponse("partials/event_results.html", context=ctx)
