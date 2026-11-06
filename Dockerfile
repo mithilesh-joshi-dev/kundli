@@ -21,11 +21,10 @@ RUN apt-get update && \
         libpango-1.0-0 \
         libpangocairo-1.0-0 \
         libpangoft2-1.0-0 \
-        libgdk-pixbuf2.0-0 \
+        libgdk-pixbuf-2.0-0 \
         libcairo2 \
-        libffi8 \
+        libffi-dev \
         shared-mime-info \
-        fonts-noto-core \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
