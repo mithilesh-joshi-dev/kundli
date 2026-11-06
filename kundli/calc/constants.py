@@ -27,6 +27,82 @@ NAKSHATRA_LORDS = (
     "Jupiter", "Saturn", "Mercury",
 )
 
+# Gana per nakshatra (same order as NAKSHATRAS tuple)
+NAKSHATRA_GANA = (
+    "Deva", "Manushya", "Rakshasa", "Manushya", "Deva",
+    "Manushya", "Deva", "Deva", "Rakshasa", "Rakshasa",
+    "Manushya", "Manushya", "Deva", "Rakshasa", "Deva",
+    "Rakshasa", "Deva", "Rakshasa", "Rakshasa", "Manushya",
+    "Manushya", "Deva", "Rakshasa", "Rakshasa", "Manushya",
+    "Manushya", "Deva",
+)
+
+# Yoni per nakshatra
+NAKSHATRA_YONI = (
+    "Ashwa", "Gaja", "Mesha", "Sarpa", "Sarpa",
+    "Shwaan", "Marjara", "Mesha", "Marjara", "Mushika",
+    "Mushika", "Go", "Mahisha", "Vyaghra", "Mahisha",
+    "Vyaghra", "Mriga", "Mriga", "Shwaan", "Vanara",
+    "Nakula", "Vanara", "Simha", "Ashwa", "Simha",
+    "Go", "Gaja",
+)
+
+# Nadi index: nak_index % 3 → 0=Adi, 1=Madhya, 2=Antya
+
+# Varna by rashi (moon rashi determines varna)
+RASHI_VARNA = {
+    "Mesha": "Kshatriya", "Vrishabha": "Vaishya", "Mithuna": "Shudra",
+    "Karka": "Brahmin", "Simha": "Kshatriya", "Kanya": "Vaishya",
+    "Tula": "Shudra", "Vrischika": "Brahmin", "Dhanu": "Kshatriya",
+    "Makara": "Vaishya", "Kumbha": "Shudra", "Meena": "Brahmin",
+}
+
+# Lord of each rashi
+RASHI_LORD = {
+    "Mesha": "Mars", "Vrishabha": "Venus", "Mithuna": "Mercury",
+    "Karka": "Moon", "Simha": "Sun", "Kanya": "Mercury",
+    "Tula": "Venus", "Vrischika": "Mars", "Dhanu": "Jupiter",
+    "Makara": "Saturn", "Kumbha": "Saturn", "Meena": "Jupiter",
+}
+
+# Gemstone by nakshatra lord (Vimshottari)
+PLANET_RATNA = {
+    "Sun": "Manik", "Moon": "Moti", "Mars": "Munga",
+    "Mercury": "Panna", "Jupiter": "Pushkaraj", "Venus": "Heera",
+    "Saturn": "Neelam", "Rahu": "Gomed", "Ketu": "Lahsuniya",
+}
+
+# Janmakshara: 4 syllables per nakshatra (one per pada), Devanagari
+NAKSHATRA_JANMAKSHARA = (
+    ("चु", "चे", "चो", "ला"),   # Ashwini
+    ("ली", "लु", "ले", "लो"),   # Bharani
+    ("अ", "इ", "उ", "ए"),       # Krittika
+    ("ओ", "वा", "वि", "वु"),    # Rohini
+    ("वे", "वो", "का", "की"),   # Mrigashira
+    ("कु", "घ", "ङ", "छ"),      # Ardra
+    ("के", "को", "ह", "ही"),    # Punarvasu
+    ("हु", "हे", "हो", "ड"),    # Pushya
+    ("डी", "डु", "डे", "डो"),   # Ashlesha
+    ("म", "मि", "मु", "मे"),    # Magha
+    ("मो", "ट", "टि", "टु"),   # Purva Phalguni
+    ("टे", "टो", "प", "पि"),   # Uttara Phalguni
+    ("पु", "ष", "ण", "ठ"),     # Hasta
+    ("पे", "पो", "र", "री"),   # Chitra
+    ("रु", "रे", "रो", "त"),   # Swati
+    ("ति", "तु", "ते", "तो"),  # Vishakha
+    ("न", "नि", "नु", "ने"),   # Anuradha
+    ("नो", "य", "यि", "यु"),   # Jyeshtha
+    ("ये", "यो", "भ", "भि"),   # Moola
+    ("भु", "ध", "फ", "ढ"),     # Purva Ashadha
+    ("भे", "भो", "ज", "जि"),   # Uttara Ashadha
+    ("खि", "खु", "खे", "खो"),  # Shravana
+    ("ग", "गि", "गु", "गे"),   # Dhanishta
+    ("गो", "स", "सि", "सु"),   # Shatabhisha
+    ("से", "सो", "द", "दि"),   # Purva Bhadrapada
+    ("दु", "थ", "झ", "ञ"),     # Uttara Bhadrapada
+    ("दे", "दो", "च", "चि"),   # Revati
+)
+
 PLANETS = {
     "Sun": swe.SUN,
     "Moon": swe.MOON,
