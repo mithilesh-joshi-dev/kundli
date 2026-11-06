@@ -88,14 +88,6 @@ body {
   flex-shrink: 0;
 }
 
-/* SVG internals */
-.hl  { stroke: #e0bfb8; stroke-width: 0.8; fill: none; }
-.cb  { stroke: #C98A2C; stroke-width: 1.5; fill: #fffdf7; }
-.lf  { fill: #fff7ed; }
-.rl  { font-size: 7px; fill: #b0a090; text-anchor: middle; font-family: 'NSD', serif; }
-.hn  { font-size: 5.5px; fill: #d8c8c0; text-anchor: middle; }
-.pl  { font-size: 7.5px; font-weight: 700; fill: #8A1C14; text-anchor: middle; font-family: 'NSD', serif; }
-
 /* Detail columns — fill remaining body-row width equally */
 .detail-cols {
   flex: 1;
@@ -200,26 +192,33 @@ body {
       <svg class="chart-svg" viewBox="0 0 300 300"
            preserveAspectRatio="xMidYMid meet"
            xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="1" width="298" height="298" class="cb" rx="2"/>
-        <polygon points="{{ d1_chart[0].points }}" class="lf"/>
-        <line x1="150" y1="0"   x2="300" y2="150" class="hl"/>
-        <line x1="300" y1="150" x2="150" y2="300" class="hl"/>
-        <line x1="150" y1="300" x2="0"   y2="150" class="hl"/>
-        <line x1="0"   y1="150" x2="150" y2="0"   class="hl"/>
-        <line x1="0"   y1="0"   x2="75"  y2="75"  class="hl"/>
-        <line x1="300" y1="0"   x2="225" y2="75"  class="hl"/>
-        <line x1="300" y1="300" x2="225" y2="225" class="hl"/>
-        <line x1="0"   y1="300" x2="75"  y2="225" class="hl"/>
-        <line x1="75"  y1="75"  x2="150" y2="150" class="hl"/>
-        <line x1="225" y1="75"  x2="150" y2="150" class="hl"/>
-        <line x1="225" y1="225" x2="150" y2="150" class="hl"/>
-        <line x1="75"  y1="225" x2="150" y2="150" class="hl"/>
+        <rect x="1" y="1" width="298" height="298" rx="2"
+              fill="#fffdf7" stroke="#C98A2C" stroke-width="1.5"/>
+        <polygon points="{{ d1_chart[0].points }}" fill="#fff3e0" stroke="none"/>
+        <line x1="150" y1="0"   x2="300" y2="150" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="300" y1="150" x2="150" y2="300" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="150" y1="300" x2="0"   y2="150" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="0"   y1="150" x2="150" y2="0"   stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="0"   y1="0"   x2="75"  y2="75"  stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="300" y1="0"   x2="225" y2="75"  stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="300" y1="300" x2="225" y2="225" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="0"   y1="300" x2="75"  y2="225" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="75"  y1="75"  x2="150" y2="150" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="225" y1="75"  x2="150" y2="150" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="225" y1="225" x2="150" y2="150" stroke="#c0a090" stroke-width="0.8"/>
+        <line x1="75"  y1="225" x2="150" y2="150" stroke="#c0a090" stroke-width="0.8"/>
         {% for h in d1_chart %}
         <g>
-          <text x="{{ h.nx }}" y="{{ h.ny }}" class="hn">{{ h.number }}</text>
-          <text x="{{ h.cx }}" y="{{ h.cy - 7 }}" class="rl">{{ h.rashi_local }}</text>
+          <text x="{{ h.nx }}" y="{{ h.ny }}"
+                font-size="5.5" fill="#c0a898" text-anchor="middle"
+                font-family="serif">{{ h.number }}</text>
+          <text x="{{ h.cx }}" y="{{ h.cy - 7 }}"
+                font-size="7" fill="#8a7060" text-anchor="middle"
+                font-family="serif">{{ h.rashi_local }}</text>
           {% for pname in h.planets %}
-          <text x="{{ h.cx }}" y="{{ h.cy + 5 + loop.index0 * 10 }}" class="pl">{{ pname }}</text>
+          <text x="{{ h.cx }}" y="{{ h.cy + 5 + loop.index0 * 10 }}"
+                font-size="7.5" font-weight="bold" fill="#8A1C14" text-anchor="middle"
+                font-family="serif">{{ pname }}</text>
           {% endfor %}
         </g>
         {% endfor %}
