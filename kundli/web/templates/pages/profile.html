@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-10">
+
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">माझी प्रोफाइल</h1>
+    <p class="text-sm text-gray-500 mt-1">PDF वर दिसणारे नाव व पात्रता येथे बदला</p>
+  </div>
+
+  {% if saved %}
+  <div class="mb-6 flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 text-sm rounded-xl px-4 py-3">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>
+    बदल जतन झाले
+  </div>
+  {% endif %}
+
+  <!-- Read-only info -->
+  <div class="bg-gray-50 rounded-xl border border-gray-200 px-5 py-4 mb-6 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-full bg-saffron-100 flex items-center justify-center text-saffron-700 font-bold text-lg flex-shrink-0">
+      {{ (user_profile.display_name or current_user.get("name","?"))[0]|upper }}
+    </div>
+    <div class="min-w-0">
+      <p class="text-sm font-medium text-gray-900 truncate">
+        {{ user_profile.display_name if user_profile else current_user.get("name","") }}
+      </p>
+      <p class="text-xs text-gray-400 truncate">
+        {{ current_user.get("email","") if current_user else "" }}
+      </p>
+    </div>
+    <span class="ml-auto flex-shrink-0 text-xs font-medium px-2.5 py-1 rounded-full
+      {% if user_profile and user_profile.approved %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+      {% if user_profile and user_profile.approved %}मंजूर{% else %}प्रतीक्षा{% endif %}
+    </span>
+  </div>
+
+  <!-- Edit form -->
+  <form method="post" action="/profile" class="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-100">
+
+    <div class="px-5 py-4">
+      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+        प्रदर्शन नाव <span class="text-red-400">*</span>
+      </label>
+      <input type="text" name="display_name" required
+             value="{{ (user_profile.display_name if user_profile else current_user.get('name','')) or '' }}"
+             placeholder="उदा. पं. रामचंद्र शास्त्री"
+             class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5
+                    focus:outline-none focus:ring-2 focus:ring-saffron-400 focus:border-transparent">
+      <p class="text-xs text-gray-400 mt-1.5">PDF वर "प्रमाणित: <em>नाव</em>" असे दाखवले जाईल</p>
+    </div>
+
+    <div class="px-5 py-4">
+      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+        पात्रता / पदवी
+      </label>
+      <input type="text" name="credentials"
+             value="{{ (user_profile.credentials if user_profile else '') or '' }}"
+             placeholder="उदा. ज्योतिषाचार्य, वैदिक ज्योतिष विशेषज्ञ"
+             class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5
+                    focus:outline-none focus:ring-2 focus:ring-saffron-400 focus:border-transparent">
+      <p class="text-xs text-gray-400 mt-1.5">नावाखाली लहान अक्षरात दिसेल</p>
+    </div>
+
+    <div class="px-5 py-4">
+      <button type="submit"
+              class="w-full bg-saffron-600 hover:bg-saffron-700 active:scale-[.98] transition
+                     text-white text-sm font-semibold rounded-lg px-4 py-2.5">
+        बदल जतन करा
+      </button>
+    </div>
+
+  </form>
+
+  <!-- PDF preview hint -->
+  {% if user_profile and user_profile.display_name %}
+  <div class="mt-6 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-5 py-4">
+    <p class="text-xs text-gray-500 font-medium mb-2">PDF मध्ये असे दिसेल:</p>
+    <div class="flex items-center justify-between text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2.5">
+      <span>
+        प्रमाणित: <strong>{{ user_profile.display_name }}</strong><br>
+        <span class="text-gray-400">{{ user_profile.credentials or "पात्रता नाही" }}</span>
+      </span>
+      <span class="text-gray-300 text-[10px]">वैदिक ज्योतिष · लाहिरी अयनांश</span>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

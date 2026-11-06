@@ -100,6 +100,33 @@ async def pending_page(request: Request):
     return request.app.state.templates.TemplateResponse(request, name="pages/pending.html", context=ctx)
 
 
+@router.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    ctx = _ctx(request, "profile")
+    return request.app.state.templates.TemplateResponse(request, name="pages/profile.html", context=ctx)
+
+
+@router.post("/profile", response_class=HTMLResponse)
+async def profile_save(request: Request):
+    from ..auth import update_profile
+    form = await request.form()
+    display_name = form.get("display_name", "").strip()
+    credentials  = form.get("credentials", "").strip()
+
+    user = getattr(request.state, "user", None)
+    if user and display_name:
+        await update_profile(user["uid"], display_name, credentials)
+        # Refresh cached profile on request.state so nav updates immediately
+        request.state.profile = {
+            **(request.state.profile or {}),
+            "display_name": display_name,
+            "credentials": credentials,
+        }
+
+    ctx = _ctx(request, "profile", saved=True)
+    return request.app.state.templates.TemplateResponse(request, name="pages/profile.html", context=ctx)
+
+
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     ctx = _ctx(request, "home")

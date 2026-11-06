@@ -67,3 +67,12 @@ async def get_profile(uid: str) -> dict[str, Any] | None:
     client = AsyncClient()
     doc = await client.collection("jyotishacharyas").document(uid).get()
     return doc.to_dict() if doc.exists else None
+
+
+async def update_profile(uid: str, display_name: str, credentials: str) -> None:
+    from google.cloud.firestore_v1 import AsyncClient
+    client = AsyncClient()
+    await client.collection("jyotishacharyas").document(uid).update({
+        "display_name": display_name,
+        "credentials": credentials,
+    })
