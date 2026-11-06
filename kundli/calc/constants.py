@@ -72,6 +72,37 @@ PLANET_RATNA = {
     "Saturn": "Neelam", "Rahu": "Gomed", "Ketu": "Lahsuniya",
 }
 
+# Paya (metal) per nakshatra — repeating 4-step cycle: Swarna, Rajat, Tamra, Loh
+NAKSHATRA_PAYA = (
+    "Swarna",  # Ashwini
+    "Rajat",   # Bharani
+    "Tamra",   # Krittika
+    "Loh",     # Rohini
+    "Swarna",  # Mrigashira
+    "Rajat",   # Ardra
+    "Tamra",   # Punarvasu
+    "Loh",     # Pushya
+    "Swarna",  # Ashlesha
+    "Rajat",   # Magha
+    "Tamra",   # Purva Phalguni
+    "Loh",     # Uttara Phalguni
+    "Swarna",  # Hasta
+    "Rajat",   # Chitra
+    "Tamra",   # Swati
+    "Loh",     # Vishakha
+    "Swarna",  # Anuradha
+    "Rajat",   # Jyeshtha
+    "Tamra",   # Moola
+    "Loh",     # Purva Ashadha
+    "Swarna",  # Uttara Ashadha
+    "Rajat",   # Shravana
+    "Tamra",   # Dhanishta
+    "Loh",     # Shatabhisha
+    "Swarna",  # Purva Bhadrapada
+    "Rajat",   # Uttara Bhadrapada
+    "Tamra",   # Revati
+)
+
 # Janmakshara: 4 syllables per nakshatra (one per pada), Devanagari
 NAKSHATRA_JANMAKSHARA = (
     ("चु", "चे", "चो", "ला"),   # Ashwini
