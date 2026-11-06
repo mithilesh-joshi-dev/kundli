@@ -12,6 +12,8 @@ dependencies = [
     "jinja2>=3.1",
     "python-multipart>=0.0.6",
     "google-cloud-firestore>=2.16",
+    "reportlab>=4.0",
+    "weasyprint>=61.0",
 ]
 
 [project.scripts]

@@ -1,10 +1,38 @@
 <!-- Chart results partial — swapped in by HTMX -->
 
-{% if person_name %}
-<div class="mb-4">
+<div class="flex items-center justify-between mb-4 gap-3">
+    {% if person_name %}
     <h2 class="text-lg md:text-xl font-bold text-gray-800">{{ person_name }}</h2>
+    {% else %}
+    <div></div>
+    {% endif %}
+
+    <!-- PDF download — plain form (no HTMX), opens inline PDF in new tab -->
+    <form action="/api/pdf/chart" method="post" target="_blank">
+        <input type="hidden" name="name"        value="{{ person_name or '' }}">
+        <input type="hidden" name="date"        value="{{ data.birth.date }}">
+        <input type="hidden" name="time"        value="{{ data.birth.time }}">
+        <input type="hidden" name="lat"         value="{{ data.birth.lat }}">
+        <input type="hidden" name="lon"         value="{{ data.birth.lon }}">
+        <input type="hidden" name="utc_offset"  value="{{ data.birth.utc_offset }}">
+        <input type="hidden" name="place"       value="{{ place_name }}">
+        <input type="hidden" name="lang"        value="{{ lang }}">
+        <input type="hidden" name="report_type" value="micro">
+        <input type="hidden" name="gender"      value="{{ gender }}">
+        <input type="hidden" name="gotra"       value="{{ gotra }}">
+        <input type="hidden" name="parents"     value="{{ parents }}">
+        <button type="submit"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold
+                       bg-amber-100 hover:bg-amber-200 text-amber-800
+                       border border-amber-200 rounded-xl px-3 py-1.5 transition active:scale-95">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/>
+            </svg>
+            {{ T("ui.download_pdf") }}
+        </button>
+    </form>
 </div>
-{% endif %}
 
 <!-- Birth Details + Panchang -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">

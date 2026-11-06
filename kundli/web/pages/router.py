@@ -123,6 +123,9 @@ async def chart_results(request: Request):
     T = get_translator(lang)
 
     person_name = form.get("name", "").strip() or None
+    gender  = form.get("gender", "").strip() or None
+    gotra   = form.get("gotra", "").strip() or None
+    parents = form.get("parents", "").strip() or None
     body = BirthInput(
         name=person_name,
         date=form["date"], time=form["time"],
@@ -156,6 +159,10 @@ async def chart_results(request: Request):
         "data": data,
         "houses_data": houses_data,
         "person_name": person_name,
+        "place_name": body.place or "",
+        "gender": gender or "",
+        "gotra": gotra or "",
+        "parents": parents or "",
     }
     return request.app.state.templates.TemplateResponse(request, name="partials/chart_results.html", context=ctx)
 

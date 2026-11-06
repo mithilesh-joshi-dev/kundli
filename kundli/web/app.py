@@ -12,6 +12,7 @@ from fastapi.templating import Jinja2Templates
 
 from ..config import settings
 from .api import chart, events, geocode, matching, predict, transit
+from .api.pdf_api import router as pdf_router
 from .pages.router import router as pages_router
 
 BASE_DIR = Path(__file__).parent
@@ -91,6 +92,7 @@ def create_app() -> FastAPI:
     app.include_router(matching.router, prefix="/api", tags=["matching"])
     app.include_router(geocode.router, prefix="/api", tags=["geocode"])
     app.include_router(events.router, prefix="/api", tags=["events"])
+    app.include_router(pdf_router, tags=["pdf"])
     app.include_router(pages_router)
 
     return app

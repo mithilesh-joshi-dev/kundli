@@ -15,6 +15,19 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# WeasyPrint requires Pango + Cairo for HTML→PDF rendering (Devanagari shaping)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libpangoft2-1.0-0 \
+        libgdk-pixbuf2.0-0 \
+        libcairo2 \
+        libffi8 \
+        shared-mime-info \
+        fonts-noto-core \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app /app
