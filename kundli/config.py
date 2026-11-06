@@ -66,12 +66,22 @@ class FirestoreConfig:
 
 
 @dataclass(frozen=True)
+class FirebaseConfig:
+    """Firebase web SDK config — used in the login page."""
+    api_key: str      = field(default_factory=lambda: _env("FIREBASE_API_KEY", ""))
+    auth_domain: str  = field(default_factory=lambda: _env("FIREBASE_AUTH_DOMAIN", ""))
+    project_id: str   = field(default_factory=lambda: _env("FIREBASE_PROJECT_ID", ""))
+    app_id: str       = field(default_factory=lambda: _env("FIREBASE_APP_ID", ""))
+
+
+@dataclass(frozen=True)
 class Settings:
     server: ServerConfig = field(default_factory=ServerConfig)
     app: AppConfig = field(default_factory=AppConfig)
     features: FeaturesConfig = field(default_factory=FeaturesConfig)
     limits: LimitsConfig = field(default_factory=LimitsConfig)
     firestore: FirestoreConfig = field(default_factory=FirestoreConfig)
+    firebase: FirebaseConfig = field(default_factory=FirebaseConfig)
 
 
 # Singleton — import this everywhere

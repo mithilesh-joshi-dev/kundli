@@ -239,8 +239,13 @@ body {
   <!-- Verification strip -->
   <div class="verify">
     <div class="verify-label">
-      ज्योतिषी प्रमाणन<br>
-      <span style="font-size:5pt;color:#9A8060;">वैदिक ज्योतिष · लाहिरी अयनांश</span>
+      {% if astrologer_name %}
+        प्रमाणित: {{ astrologer_name }}<br>
+        <span style="font-size:5pt;color:#9A8060;">{{ astrologer_credentials }}</span>
+      {% else %}
+        ज्योतिषी प्रमाणन<br>
+        <span style="font-size:5pt;color:#9A8060;">वैदिक ज्योतिष · लाहिरी अयनांश</span>
+      {% endif %}
     </div>
     <div class="verify-stamp"></div>
     <div class="verify-date">

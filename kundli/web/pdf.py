@@ -481,6 +481,8 @@ def generate_micro_mr_pdf(
     gender: str | None = None,
     gotra: str | None = None,
     parents: str | None = None,
+    astrologer_name: str | None = None,
+    astrologer_credentials: str | None = None,
 ) -> bytes:
     """Return PDF bytes — Marathi portrait micro card via WeasyPrint."""
     d = _collect_data(birth)
@@ -606,6 +608,8 @@ def generate_micro_mr_pdf(
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
         latlon=latlon,
+        astrologer_name=astrologer_name or "",
+        astrologer_credentials=astrologer_credentials or "",
     )
 
     HTML = _weasyprint_html()

@@ -112,6 +112,19 @@
                     </button>
                     {% endfor %}
                 </div>
+                {% if current_user %}
+                <div class="flex items-center gap-2 pl-2 border-l border-gray-200">
+                    <span class="text-xs text-gray-500 max-w-[120px] truncate">
+                        {{ (user_profile.display_name if user_profile else current_user.get("name", "")) }}
+                    </span>
+                    <a href="/auth/logout"
+                       class="text-xs text-gray-400 hover:text-red-500 transition" title="साइन आउट">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+                        </svg>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </nav>
