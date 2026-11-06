@@ -23,6 +23,7 @@ from reportlab.pdfgen import canvas as rl_canvas
 from ..calc.constants import (
     NAKSHATRA_LORDS, NAKSHATRAS,
     NAKSHATRA_GANA, NAKSHATRA_YONI, NAKSHATRA_JANMAKSHARA,
+    NAKSHATRA_PAYA,
     RASHI_VARNA, RASHI_LORD, PLANET_RATNA,
 )
 from ..calc.dasha import calculate_dasha
@@ -91,6 +92,12 @@ _MR_RATNA = {
     "Manik": "माणिक", "Moti": "मोती", "Munga": "मुंगा",
     "Panna": "पाचू", "Pushkaraj": "पुष्कराज", "Heera": "हिरा",
     "Neelam": "नीलम", "Gomed": "गोमेद", "Lahsuniya": "लहसुनिया",
+}
+_MR_PAYA = {
+    "Swarna": "सोन्याचा पाय",
+    "Rajat":  "रुप्याचा पाय",
+    "Tamra":  "तांब्याचा पाय",
+    "Loh":    "लोखंडाचा पाय",
 }
 
 
@@ -557,6 +564,9 @@ def generate_micro_mr_pdf(
     ratna_key = PLANET_RATNA.get(moon_rashi_lord, "")
     ratna_mr = _MR_RATNA.get(ratna_key, ratna_key)
 
+    # Paya (metal) from Moon nakshatra
+    paya_mr = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
+
     # Lagna rashi (already computed above as lagna_rashi_mr)
 
     # Mahadasha duration
@@ -604,6 +614,7 @@ def generate_micro_mr_pdf(
         parents=parents or "—",
         gana_yoni=f"{gana_mr} / {yoni_mr}",
         nadi_varna=f"{nadi_mr} / {varna_mr}",
+        paya=paya_mr,
         janmakshara=janmakshara,
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
