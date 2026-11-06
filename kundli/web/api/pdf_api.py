@@ -7,7 +7,7 @@ from fastapi.responses import Response
 
 from ...config import settings
 from ..api.common import BirthInput, parse_birth
-from ..pdf import generate_micro_mr_pdf, generate_micro_pdf
+from ..pdf import generate_micro_mr_pdf, generate_micro_pdf, generate_mini_mr_pdf
 
 router = APIRouter()
 
@@ -45,24 +45,23 @@ async def pdf_chart_form(
     astrologer_name = profile.get("display_name", "") if profile else ""
     astrologer_cred = profile.get("credentials", "") if profile else ""
 
+    kwargs = dict(
+        person_name=body.name or None,
+        place_name=body.place or None,
+        gender=gender or None,
+        gotra=gotra or None,
+        parents=parents or None,
+        astrologer_name=astrologer_name or None,
+        astrologer_credentials=astrologer_cred or None,
+    )
+
     if report_type == "micro":
-        if lang == "mr":
-            pdf_bytes = generate_micro_mr_pdf(
-                birth,
-                person_name=body.name or None,
-                place_name=body.place or None,
-                gender=gender or None,
-                gotra=gotra or None,
-                parents=parents or None,
-                astrologer_name=astrologer_name or None,
-                astrologer_credentials=astrologer_cred or None,
-            )
-        else:
-            pdf_bytes = generate_micro_pdf(
-                birth,
-                person_name=body.name or None,
-                place_name=body.place or None,
-            )
+        pdf_bytes = generate_micro_mr_pdf(birth, **kwargs) if lang == "mr" else generate_micro_pdf(birth, person_name=body.name or None, place_name=body.place or None)
+    elif report_type == "mini":
+        pdf_bytes = generate_mini_mr_pdf(birth, **kwargs) if lang == "mr" else generate_micro_pdf(birth, person_name=body.name or None, place_name=body.place or None)
+    elif report_type == "full":
+        from fastapi import HTTPException
+        raise HTTPException(400, "Full Janma Patrika लवकरच उपलब्ध होईल.")
     else:
         from fastapi import HTTPException
         raise HTTPException(400, f"Report type '{report_type}' not yet available.")

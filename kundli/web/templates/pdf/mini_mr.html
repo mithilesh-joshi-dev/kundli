@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<style>
+/* 420pt × 560pt — fits both chart and all micro details */
+@page { size: 420pt 560pt; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+@font-face {
+  font-family: 'NSD';
+  src: url('fonts/NotoSerifDevanagari.ttf') format('truetype');
+  font-weight: 100 900;
+}
+
+body {
+  width: 420pt; height: 560pt; overflow: hidden;
+  background: #FFFDF7;
+  font-family: 'NSD', serif;
+}
+
+/* ── Frame ───────────────────────────────────────────────────────────────── */
+.frame {
+  position: absolute; inset: 7pt; pointer-events: none; z-index: 10;
+  box-shadow:
+    inset 0 0 0 2pt #C98A2C,
+    inset 0 0 0 5pt #FFFEFB,
+    inset 0 0 0 7pt #8A1C14;
+}
+.corner { position: absolute; width: 16pt; height: 16pt; z-index: 11; }
+.corner-tl { top: 7pt;    left: 7pt; }
+.corner-tr { top: 7pt;    right: 7pt;    transform: scaleX(-1); }
+.corner-bl { bottom: 7pt; left: 7pt;     transform: scaleY(-1); }
+.corner-br { bottom: 7pt; right: 7pt;    transform: scale(-1,-1); }
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+.page {
+  position: absolute; inset: 18pt;
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.mantra {
+  text-align: center; padding: 3pt 4pt 2pt; flex-shrink: 0;
+  font-size: 6.5pt; color: #8A1C14; letter-spacing: 0.3pt;
+}
+.title-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 5pt; margin-top: 2pt; flex-shrink: 0;
+}
+.title-row .ln { flex: 1; height: 0.5pt; background: linear-gradient(to right, transparent, #8A1C14 50%, transparent); }
+.title-main { font-size: 15pt; font-weight: 700; color: #8A1C14; letter-spacing: 1.5pt; }
+.swk { font-size: 11pt; color: #C98A2C; }
+
+/* ── Main body: chart left + 2 detail cols right ─────────────────────────── */
+.body-row {
+  display: flex; gap: 5pt;
+  margin-top: 5pt; flex: 1; min-height: 0;
+}
+
+/* Chart column */
+.chart-col {
+  width: 180pt; flex-shrink: 0;
+  border: 0.7pt solid #E0BFB8; background: #FFFDF8;
+  display: flex; flex-direction: column;
+}
+.chart-hdr {
+  font-size: 6pt; font-weight: 700; color: #8A1C14;
+  text-align: center; padding: 3pt;
+  background: #FDF8ED; border-bottom: 0.5pt solid #E0BFB8;
+  flex-shrink: 0;
+}
+.chart-svg { display: block; width: 100%; flex: 1; }
+
+/* SVG internal styles */
+.hl  { stroke: #d1d5db; stroke-width: 1; fill: none; }
+.cb  { stroke: #c9a060; stroke-width: 1.5; fill: #fffdf7; }
+.lf  { fill: #fff7ed; }
+.rl  { font-size: 7.5px; fill: #9ca3af; text-anchor: middle; font-family: 'NSD', serif; }
+.hn  { font-size: 6px; fill: #d1d5db; text-anchor: middle; }
+.pl  { font-size: 8px; font-weight: 600; fill: #8A1C14; text-anchor: middle; font-family: 'NSD', serif; }
+
+/* Detail columns */
+.detail-cols {
+  flex: 1; display: flex; gap: 4pt; min-width: 0;
+}
+.dcol {
+  flex: 1;
+  border: 0.7pt solid #E0BFB8; background: #FFFDF8;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.dcol-hdr {
+  font-size: 6pt; font-weight: 700; color: #8A1C14;
+  padding: 3pt 5pt; background: #FDF8ED;
+  border-bottom: 0.5pt solid #E0BFB8; flex-shrink: 0;
+  letter-spacing: 0.2pt;
+}
+.dr {
+  display: flex; flex-direction: column;
+  padding: 2pt 5pt; border-bottom: 0.4pt solid #F0E8D0;
+  flex: 1;
+}
+.dr:last-child { border-bottom: none; }
+.dr:nth-child(even) { background: rgba(251,244,228,0.6); }
+.dk { font-size: 5pt; color: #58413E; line-height: 1.2; }
+.dv { font-size: 7pt; font-weight: 700; color: #8A1C14; line-height: 1.3; margin-top: 0.5pt; }
+
+/* ── Verification ────────────────────────────────────────────────────────── */
+.verify {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 5pt; padding: 3pt 7pt;
+  border: 0.5pt solid #E0BFB8; background: #FFFDF8; flex-shrink: 0;
+}
+.verify-label { font-size: 5.5pt; color: #58413E; line-height: 1.4; }
+.verify-stamp {
+  width: 36pt; height: 20pt;
+  border: 0.5pt dashed #C98A2C; background: rgba(251,244,228,0.3);
+}
+.verify-date { font-size: 5.5pt; color: #9A8060; text-align: right; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div class="frame"></div>
+{% for cls in ["corner-tl","corner-tr","corner-bl","corner-br"] %}
+<svg class="corner {{ cls }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 3H18C18 11.284 11.284 18 3 18V3Z" fill="#8A1C14" fill-opacity="0.05"/>
+  <path d="M3 3L18 18M3 3V16M3 3H16M9 3C9 7.418 5.418 11 1 11" stroke="#C98A2C" stroke-width="0.8" fill="none" stroke-opacity="0.5"/>
+  <circle cx="9" cy="9" fill="#C98A2C" r="1.2" fill-opacity="0.6"/>
+</svg>
+{% endfor %}
+
+<div class="page">
+
+  <div class="mantra">॥ कुलदैवत प्रसन्न ॥  ★  ॥ श्री गणेशाय नमः ॥  ★  ॥ श्री कुलस्वामिनी प्रसन्न ॥</div>
+  <div class="title-row">
+    <div class="ln"></div>
+    <span class="swk">卐</span>
+    <span class="title-main">जन्म पत्रिका</span>
+    <span class="swk">卐</span>
+    <div class="ln"></div>
+  </div>
+
+  <div class="body-row">
+
+    <!-- D1 Chart -->
+    <div class="chart-col">
+      <div class="chart-hdr">जन्म कुंडली (D1)</div>
+      <svg class="chart-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="298" height="298" class="cb" rx="2"/>
+        <polygon points="{{ d1_chart[0].points }}" class="lf"/>
+        <line x1="150" y1="0"   x2="300" y2="150" class="hl"/>
+        <line x1="300" y1="150" x2="150" y2="300" class="hl"/>
+        <line x1="150" y1="300" x2="0"   y2="150" class="hl"/>
+        <line x1="0"   y1="150" x2="150" y2="0"   class="hl"/>
+        <line x1="0"   y1="0"   x2="75"  y2="75"  class="hl"/>
+        <line x1="300" y1="0"   x2="225" y2="75"  class="hl"/>
+        <line x1="300" y1="300" x2="225" y2="225" class="hl"/>
+        <line x1="0"   y1="300" x2="75"  y2="225" class="hl"/>
+        <line x1="75"  y1="75"  x2="150" y2="150" class="hl"/>
+        <line x1="225" y1="75"  x2="150" y2="150" class="hl"/>
+        <line x1="225" y1="225" x2="150" y2="150" class="hl"/>
+        <line x1="75"  y1="225" x2="150" y2="150" class="hl"/>
+        {% for h in d1_chart %}
+        <g>
+          <text x="{{ h.nx }}" y="{{ h.ny }}" class="hn">{{ h.number }}</text>
+          <text x="{{ h.cx }}" y="{{ h.cy - 7 }}" class="rl">{{ h.rashi_local }}</text>
+          {% for pname in h.planets %}
+          <text x="{{ h.cx }}" y="{{ h.cy + 5 + loop.index0 * 10 }}" class="pl">{{ pname }}</text>
+          {% endfor %}
+        </g>
+        {% endfor %}
+      </svg>
+    </div>
+
+    <!-- Detail columns -->
+    <div class="detail-cols">
+
+      <!-- Left: birth info -->
+      <div class="dcol">
+        <div class="dcol-hdr">मूलभूत तपशील</div>
+        <div class="dr"><span class="dk">संपूर्ण नाव</span><span class="dv">{{ person_name }}</span></div>
+        <div class="dr"><span class="dk">लिंग</span><span class="dv">{{ gender }}</span></div>
+        <div class="dr"><span class="dk">जन्म तारीख</span><span class="dv">{{ birth_date_dev }}</span></div>
+        <div class="dr"><span class="dk">तिथी / वार</span><span class="dv">{{ tithi }} / {{ vara }}</span></div>
+        <div class="dr"><span class="dk">जन्म वेळ</span><span class="dv">{{ birth_time_dev }} वा.</span></div>
+        <div class="dr"><span class="dk">जन्म स्थान</span><span class="dv">{{ place }}</span></div>
+        <div class="dr"><span class="dk">अक्षांश / रेखांश</span><span class="dv">{{ latlon }}</span></div>
+        <div class="dr"><span class="dk">माता-पिता</span><span class="dv">{{ parents }}</span></div>
+        <div class="dr"><span class="dk">गोत्र</span><span class="dv">{{ gotra }}</span></div>
+      </div>
+
+      <!-- Right: jyotish info -->
+      <div class="dcol">
+        <div class="dcol-hdr">ज्योतिष तपशील</div>
+        <div class="dr"><span class="dk">जन्म रास</span><span class="dv">{{ moon_rashi }}</span></div>
+        <div class="dr"><span class="dk">जन्माक्षर</span><span class="dv">{{ janmakshara }}</span></div>
+        <div class="dr"><span class="dk">नक्षत्र / चरण</span><span class="dv">{{ nakshatra }} ({{ charan }})</span></div>
+        <div class="dr"><span class="dk">गण / योनी</span><span class="dv">{{ gana_yoni }}</span></div>
+        <div class="dr"><span class="dk">नाडी / वर्ण</span><span class="dv">{{ nadi_varna }}</span></div>
+        <div class="dr"><span class="dk">पाय</span><span class="dv">{{ paya }}</span></div>
+        <div class="dr"><span class="dk">सूर्य / चंद्र रास</span><span class="dv">{{ sun_moon_rashi }}</span></div>
+        <div class="dr"><span class="dk">लग्न / राशी स्वामी</span><span class="dv">{{ lagna_rashi }} / {{ rashi_swami_ratna }}</span></div>
+        <div class="dr"><span class="dk">महादशा / अंतर</span><span class="dv">{{ maha_lord }} / {{ antar_lord }}</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Verification -->
+  <div class="verify">
+    <div class="verify-label">
+      {% if astrologer_name %}
+        प्रमाणित: <strong>{{ astrologer_name }}</strong><br>
+        <span style="font-size:5pt;color:#9A8060;">{{ astrologer_credentials }}</span>
+      {% else %}
+        ज्योतिषी प्रमाणन<br>
+        <span style="font-size:5pt;color:#9A8060;">वैदिक ज्योतिष · लाहिरी अयनांश</span>
+      {% endif %}
+    </div>
+    <div class="verify-stamp"></div>
+    <div class="verify-date">
+      दिनांक: {{ today }}<br>
+      <span style="font-size:5pt;color:#9A8060;">विंशोत्तरी दशा</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
