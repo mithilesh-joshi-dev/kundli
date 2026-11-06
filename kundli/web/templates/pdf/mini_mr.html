@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <style>
-/* 420pt × 560pt — fits both chart and all micro details */
 @page { size: 420pt 560pt; margin: 0; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -33,56 +32,75 @@ body {
 .corner-bl { bottom: 7pt; left: 7pt;     transform: scaleY(-1); }
 .corner-br { bottom: 7pt; right: 7pt;    transform: scale(-1,-1); }
 
-/* ── Page ────────────────────────────────────────────────────────────────── */
+/* ── Page column ─────────────────────────────────────────────────────────── */
 .page {
   position: absolute; inset: 18pt;
-  display: flex; flex-direction: column; gap: 0;
+  /* 384pt × 524pt working area */
+  display: flex; flex-direction: column;
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .mantra {
   text-align: center; padding: 3pt 4pt 2pt; flex-shrink: 0;
-  font-size: 6.5pt; color: #8A1C14; letter-spacing: 0.3pt;
+  font-size: 6.5pt; color: #8A1C14; letter-spacing: 0.3pt; line-height: 1.4;
 }
 .title-row {
   display: flex; align-items: center; justify-content: center;
   gap: 5pt; margin-top: 2pt; flex-shrink: 0;
 }
-.title-row .ln { flex: 1; height: 0.5pt; background: linear-gradient(to right, transparent, #8A1C14 50%, transparent); }
+.title-row .ln {
+  flex: 1; height: 0.5pt;
+  background: linear-gradient(to right, transparent, #8A1C14 50%, transparent);
+}
 .title-main { font-size: 15pt; font-weight: 700; color: #8A1C14; letter-spacing: 1.5pt; }
 .swk { font-size: 11pt; color: #C98A2C; }
 
-/* ── Main body: chart left + 2 detail cols right ─────────────────────────── */
+/* ── Body row: chart (fixed 180pt) + 2 detail cols ───────────────────────── */
+/* Fixed height = SVG 180pt + col-header 14pt = 194pt
+   This forces the chart to render as a true square and the
+   detail columns to match it exactly — the symmetry anchor. */
 .body-row {
-  display: flex; gap: 5pt;
-  margin-top: 5pt; flex: 1; min-height: 0;
+  display: flex; gap: 5pt; align-items: stretch;
+  margin-top: 5pt; flex-shrink: 0;
+  height: 194pt;
 }
 
-/* Chart column */
 .chart-col {
-  width: 180pt; flex-shrink: 0;
-  border: 0.7pt solid #E0BFB8; background: #FFFDF8;
+  flex: 0 0 180pt;                       /* fixed width, never grows */
+  border: 0.7pt solid #C98A2C;
+  background: #FFFDF8;
   display: flex; flex-direction: column;
 }
 .chart-hdr {
+  height: 14pt; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
   font-size: 6pt; font-weight: 700; color: #8A1C14;
-  text-align: center; padding: 3pt;
-  background: #FDF8ED; border-bottom: 0.5pt solid #E0BFB8;
+  background: linear-gradient(to bottom, #FDF8ED, #F9F0E0);
+  border-bottom: 0.7pt solid #C98A2C;
+  letter-spacing: 0.3pt;
+}
+/* Explicit 180×180pt forces the SVG to render as a square,
+   matching the chart col's fixed 180pt width. */
+.chart-svg {
+  display: block;
+  width: 180pt;
+  height: 180pt;
   flex-shrink: 0;
 }
-.chart-svg { display: block; width: 100%; flex: 1; }
 
-/* SVG internal styles */
-.hl  { stroke: #d1d5db; stroke-width: 1; fill: none; }
-.cb  { stroke: #c9a060; stroke-width: 1.5; fill: #fffdf7; }
+/* SVG internals */
+.hl  { stroke: #e0bfb8; stroke-width: 0.8; fill: none; }
+.cb  { stroke: #C98A2C; stroke-width: 1.5; fill: #fffdf7; }
 .lf  { fill: #fff7ed; }
-.rl  { font-size: 7.5px; fill: #9ca3af; text-anchor: middle; font-family: 'NSD', serif; }
-.hn  { font-size: 6px; fill: #d1d5db; text-anchor: middle; }
-.pl  { font-size: 8px; font-weight: 600; fill: #8A1C14; text-anchor: middle; font-family: 'NSD', serif; }
+.rl  { font-size: 7px; fill: #b0a090; text-anchor: middle; font-family: 'NSD', serif; }
+.hn  { font-size: 5.5px; fill: #d8c8c0; text-anchor: middle; }
+.pl  { font-size: 7.5px; font-weight: 700; fill: #8A1C14; text-anchor: middle; font-family: 'NSD', serif; }
 
-/* Detail columns */
+/* Detail columns — fill remaining body-row width equally */
 .detail-cols {
-  flex: 1; display: flex; gap: 4pt; min-width: 0;
+  flex: 1;
+  display: flex; gap: 4pt; align-items: stretch;
+  min-width: 0;
 }
 .dcol {
   flex: 1;
@@ -90,27 +108,57 @@ body {
   display: flex; flex-direction: column;
   overflow: hidden;
 }
-.dcol-hdr {
-  font-size: 6pt; font-weight: 700; color: #8A1C14;
-  padding: 3pt 5pt; background: #FDF8ED;
-  border-bottom: 0.5pt solid #E0BFB8; flex-shrink: 0;
+.col-hdr {
+  height: 14pt; flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 0 6pt;
+  font-size: 5.5pt; font-weight: 700; color: #8A1C14;
+  background: linear-gradient(to bottom, #FDF8ED, #F9F0E0);
+  border-bottom: 0.7pt solid #E0BFB8;
   letter-spacing: 0.2pt;
 }
+/* 9 rows, each claiming equal share of (194pt − 14pt header) = 180pt → 20pt/row */
 .dr {
-  display: flex; flex-direction: column;
-  padding: 2pt 5pt; border-bottom: 0.4pt solid #F0E8D0;
   flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 6pt;
+  border-bottom: 0.4pt solid #F0E8D0;
 }
-.dr:last-child { border-bottom: none; }
-.dr:nth-child(even) { background: rgba(251,244,228,0.6); }
-.dk { font-size: 5pt; color: #58413E; line-height: 1.2; }
-.dv { font-size: 7pt; font-weight: 700; color: #8A1C14; line-height: 1.3; margin-top: 0.5pt; }
+.dr:last-child  { border-bottom: none; }
+.dr:nth-child(even) { background: rgba(251,244,228,0.55); }
+.dk { font-size: 4.8pt; color: #7A5A54; line-height: 1; }
+.dv { font-size: 6.8pt; font-weight: 700; color: #8A1C14; line-height: 1.25; margin-top: 1pt; }
 
-/* ── Verification ────────────────────────────────────────────────────────── */
+/* ── Bottom row: panchang + dasha ────────────────────────────────────────── */
+/* flex: 1 fills all remaining page space after the fixed body-row */
+.bottom-row {
+  flex: 1; min-height: 0;
+  display: flex; gap: 5pt; align-items: stretch;
+  margin-top: 5pt;
+}
+.bcol {
+  flex: 1;
+  border: 0.7pt solid #E0BFB8; background: #FFFDF8;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+/* 4 bottom rows each claim equal share of available height */
+.br {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 6pt;
+  border-bottom: 0.4pt solid #F0E8D0;
+}
+.br:last-child { border-bottom: none; }
+.br:nth-child(even) { background: rgba(251,244,228,0.55); }
+/* reuse .col-hdr, .dk, .dv */
+
+/* ── Verification strip ──────────────────────────────────────────────────── */
 .verify {
+  flex-shrink: 0;
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 5pt; padding: 3pt 7pt;
-  border: 0.5pt solid #E0BFB8; background: #FFFDF8; flex-shrink: 0;
+  border: 0.5pt solid #E0BFB8; background: #FFFDF8;
 }
 .verify-label { font-size: 5.5pt; color: #58413E; line-height: 1.4; }
 .verify-stamp {
@@ -133,6 +181,7 @@ body {
 
 <div class="page">
 
+  <!-- ══ HEADER ══ -->
   <div class="mantra">॥ कुलदैवत प्रसन्न ॥  ★  ॥ श्री गणेशाय नमः ॥  ★  ॥ श्री कुलस्वामिनी प्रसन्न ॥</div>
   <div class="title-row">
     <div class="ln"></div>
@@ -142,12 +191,15 @@ body {
     <div class="ln"></div>
   </div>
 
+  <!-- ══ BODY ROW: chart + 2 detail cols, fixed 194pt ══ -->
   <div class="body-row">
 
-    <!-- D1 Chart -->
+    <!-- D1 Rashi Kundali — 180×180pt square -->
     <div class="chart-col">
       <div class="chart-hdr">जन्म कुंडली (D1)</div>
-      <svg class="chart-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <svg class="chart-svg" viewBox="0 0 300 300"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="1" width="298" height="298" class="cb" rx="2"/>
         <polygon points="{{ d1_chart[0].points }}" class="lf"/>
         <line x1="150" y1="0"   x2="300" y2="150" class="hl"/>
@@ -174,12 +226,11 @@ body {
       </svg>
     </div>
 
-    <!-- Detail columns -->
+    <!-- Detail columns — same 194pt height, rows distribute evenly -->
     <div class="detail-cols">
 
-      <!-- Left: birth info -->
       <div class="dcol">
-        <div class="dcol-hdr">मूलभूत तपशील</div>
+        <div class="col-hdr">मूलभूत तपशील</div>
         <div class="dr"><span class="dk">संपूर्ण नाव</span><span class="dv">{{ person_name }}</span></div>
         <div class="dr"><span class="dk">लिंग</span><span class="dv">{{ gender }}</span></div>
         <div class="dr"><span class="dk">जन्म तारीख</span><span class="dv">{{ birth_date_dev }}</span></div>
@@ -191,9 +242,8 @@ body {
         <div class="dr"><span class="dk">गोत्र</span><span class="dv">{{ gotra }}</span></div>
       </div>
 
-      <!-- Right: jyotish info -->
       <div class="dcol">
-        <div class="dcol-hdr">ज्योतिष तपशील</div>
+        <div class="col-hdr">ज्योतिष तपशील</div>
         <div class="dr"><span class="dk">जन्म रास</span><span class="dv">{{ moon_rashi }}</span></div>
         <div class="dr"><span class="dk">जन्माक्षर</span><span class="dv">{{ janmakshara }}</span></div>
         <div class="dr"><span class="dk">नक्षत्र / चरण</span><span class="dv">{{ nakshatra }} ({{ charan }})</span></div>
@@ -208,7 +258,28 @@ body {
     </div>
   </div>
 
-  <!-- Verification -->
+  <!-- ══ BOTTOM ROW: panchang + dasha, fills remaining page height ══ -->
+  <div class="bottom-row">
+
+    <div class="bcol">
+      <div class="col-hdr">पंचांग तपशील</div>
+      <div class="br"><span class="dk">तिथी</span><span class="dv">{{ tithi }}</span></div>
+      <div class="br"><span class="dk">वार</span><span class="dv">{{ vara }}</span></div>
+      <div class="br"><span class="dk">योग</span><span class="dv">{{ yoga }}</span></div>
+      <div class="br"><span class="dk">करण</span><span class="dv">{{ karana }}</span></div>
+    </div>
+
+    <div class="bcol">
+      <div class="col-hdr">विंशोत्तरी दशा</div>
+      <div class="br"><span class="dk">महादशा</span><span class="dv">{{ maha_lord }}</span></div>
+      <div class="br"><span class="dk">महादशा काल</span><span class="dv">{{ maha_range }}</span></div>
+      <div class="br"><span class="dk">अंतर्दशा</span><span class="dv">{{ antar_lord }}</span></div>
+      <div class="br"><span class="dk">अंतर्दशा काल</span><span class="dv">{{ antar_range }}</span></div>
+    </div>
+
+  </div>
+
+  <!-- ══ VERIFICATION ══ -->
   <div class="verify">
     <div class="verify-label">
       {% if astrologer_name %}
