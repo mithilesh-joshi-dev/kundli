@@ -64,6 +64,8 @@ def _ctx(request: Request, page: str = "home", **kwargs):
     """Build template context with lang, T, and common vars."""
     lang = request.query_params.get("lang", settings.app.default_lang)
     T = get_translator(lang)
+    user = getattr(request.state, "user", None)
+    profile = getattr(request.state, "profile", None)
     return {
         "request": request,
         "lang": lang,
@@ -71,11 +73,32 @@ def _ctx(request: Request, page: str = "home", **kwargs):
         "page": page,
         "languages": SUPPORTED_LANGUAGES,
         "features": settings.features,
+        "current_user": user,
+        "user_profile": profile,
         **kwargs,
     }
 
 
 # === Page Routes ===
+
+@router.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    from ...config import settings as cfg
+    ctx = {
+        "request": request,
+        "firebase": cfg.firebase,
+    }
+    return request.app.state.templates.TemplateResponse(request, name="pages/login.html", context=ctx)
+
+
+@router.get("/pending", response_class=HTMLResponse)
+async def pending_page(request: Request):
+    ctx = {
+        "request": request,
+        "current_user": getattr(request.state, "user", None),
+    }
+    return request.app.state.templates.TemplateResponse(request, name="pages/pending.html", context=ctx)
+
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):

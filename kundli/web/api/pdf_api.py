@@ -1,6 +1,8 @@
 """PDF chart download endpoint — accepts HTML form submissions."""
 
-from fastapi import APIRouter, Form
+import unicodedata
+
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
 
 from ...config import settings
@@ -12,6 +14,7 @@ router = APIRouter()
 
 @router.post("/api/pdf/chart")
 async def pdf_chart_form(
+    request: Request,
     name: str = Form(default=""),
     date: str = Form(...),
     time: str = Form(...),
@@ -37,6 +40,11 @@ async def pdf_chart_form(
     )
     birth = parse_birth(body)
 
+    # Pull astrologer info from the session user's profile
+    profile = getattr(request.state, "profile", None)
+    astrologer_name = profile.get("display_name", "") if profile else ""
+    astrologer_cred = profile.get("credentials", "") if profile else ""
+
     if report_type == "micro":
         if lang == "mr":
             pdf_bytes = generate_micro_mr_pdf(
@@ -46,6 +54,8 @@ async def pdf_chart_form(
                 gender=gender or None,
                 gotra=gotra or None,
                 parents=parents or None,
+                astrologer_name=astrologer_name or None,
+                astrologer_credentials=astrologer_cred or None,
             )
         else:
             pdf_bytes = generate_micro_pdf(
@@ -57,7 +67,6 @@ async def pdf_chart_form(
         from fastapi import HTTPException
         raise HTTPException(400, f"Report type '{report_type}' not yet available.")
 
-    import unicodedata
     raw = body.name or "chart"
     ascii_name = unicodedata.normalize("NFKD", raw).encode("ascii", "ignore").decode() or "chart"
     safe_name = ascii_name.strip().replace(" ", "_") or "kundli"

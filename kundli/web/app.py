@@ -6,14 +6,51 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from ..config import settings
 from .api import chart, events, geocode, matching, predict, transit
+from .api.auth_api import router as auth_router
 from .api.pdf_api import router as pdf_router
 from .pages.router import router as pages_router
+
+# Paths that do NOT require authentication
+_PUBLIC_PATHS = {"/login", "/pending", "/auth/session", "/auth/logout", "/health"}
+_PUBLIC_PREFIXES = ("/static/",)
+
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        if path in _PUBLIC_PATHS or any(path.startswith(p) for p in _PUBLIC_PREFIXES):
+            return await call_next(request)
+
+        cookie = request.cookies.get("__session")
+        if not cookie:
+            return RedirectResponse("/login", status_code=302)
+
+        try:
+            from .auth import verify_session, get_profile
+            claims = verify_session(cookie)
+            request.state.user = claims
+            # Attach Firestore profile (non-blocking best-effort)
+            try:
+                profile = await get_profile(claims["uid"])
+                request.state.profile = profile
+                # Redirect unapproved users to pending page
+                if path != "/pending" and (not profile or not profile.get("approved")):
+                    return RedirectResponse("/pending", status_code=302)
+            except Exception:
+                request.state.profile = None
+        except Exception:
+            response = RedirectResponse("/login", status_code=302)
+            response.delete_cookie("__session")
+            return response
+
+        return await call_next(request)
 
 BASE_DIR = Path(__file__).parent
 
@@ -31,6 +68,7 @@ def create_app() -> FastAPI:
 
     # --- Middleware ---
 
+    app.add_middleware(AuthMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.app.cors_origins,
@@ -86,6 +124,7 @@ def create_app() -> FastAPI:
     def health_check():
         return {"status": "ok", "version": "0.1.0"}
 
+    app.include_router(auth_router, tags=["auth"])
     app.include_router(chart.router, prefix="/api", tags=["chart"])
     app.include_router(predict.router, prefix="/api", tags=["predict"])
     app.include_router(transit.router, prefix="/api", tags=["transit"])
