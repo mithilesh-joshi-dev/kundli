@@ -100,6 +100,49 @@ _MR_PAYA = {
     "Loh":    "लोखंडाचा पाय",
 }
 
+_MR_PLANET_SHORT = {
+    "Sun": "सू", "Moon": "चं", "Mars": "मं", "Mercury": "बु",
+    "Jupiter": "गु", "Venus": "शु", "Saturn": "श", "Rahu": "रा", "Ketu": "के",
+}
+
+_MR_VARA = {
+    "Sunday": "रविवार", "Monday": "सोमवार", "Tuesday": "मंगळवार",
+    "Wednesday": "बुधवार", "Thursday": "गुरुवार", "Friday": "शुक्रवार",
+    "Saturday": "शनिवार",
+}
+
+# North Indian diamond house geometry (300×300 viewBox)
+_NI_HOUSES = {
+    1:  {"points": "150,0 225,75 150,150 75,75",    "cx": 150, "cy": 68,  "nx": 150, "ny": 28},
+    2:  {"points": "0,0 150,0 75,75",               "cx": 75,  "cy": 22,  "nx": 60,  "ny": 15},
+    3:  {"points": "0,0 75,75 0,150",               "cx": 22,  "cy": 68,  "nx": 12,  "ny": 28},
+    4:  {"points": "75,75 150,150 75,225 0,150",    "cx": 75,  "cy": 150, "nx": 32,  "ny": 115},
+    5:  {"points": "0,300 0,150 75,225",             "cx": 22,  "cy": 228, "nx": 12,  "ny": 268},
+    6:  {"points": "150,300 0,300 75,225",           "cx": 75,  "cy": 278, "nx": 60,  "ny": 288},
+    7:  {"points": "150,300 75,225 150,150 225,225", "cx": 150, "cy": 232, "nx": 150, "ny": 278},
+    8:  {"points": "300,300 150,300 225,225",        "cx": 225, "cy": 278, "nx": 240, "ny": 288},
+    9:  {"points": "300,150 300,300 225,225",        "cx": 278, "cy": 228, "nx": 288, "ny": 268},
+    10: {"points": "225,75 300,150 225,225 150,150", "cx": 225, "cy": 150, "nx": 268, "ny": 115},
+    11: {"points": "300,0 300,150 225,75",           "cx": 278, "cy": 68,  "nx": 288, "ny": 28},
+    12: {"points": "150,0 300,0 225,75",             "cx": 225, "cy": 22,  "nx": 240, "ny": 15},
+}
+
+
+def _build_ni_chart_data(planets_in_houses: dict[int, list[str]], lagna_rashi_idx: int, T) -> list[dict]:
+    """Build house data list for the North Indian chart SVG."""
+    from ..calc.constants import RASHIS
+    houses = []
+    for h in range(1, 13):
+        rashi = RASHIS[(lagna_rashi_idx + h - 1) % 12]
+        geo = _NI_HOUSES[h]
+        houses.append({
+            "number": h,
+            "rashi_local": T(f"rashi.{rashi}"),
+            "planets": planets_in_houses.get(h, []),
+            **geo,
+        })
+    return houses
+
 
 def _to_dev(text) -> str:
     """Convert ASCII digits in a string to Devanagari numerals."""
@@ -619,6 +662,129 @@ def generate_micro_mr_pdf(
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
         latlon=latlon,
+        astrologer_name=astrologer_name or "",
+        astrologer_credentials=astrologer_credentials or "",
+    )
+
+    HTML = _weasyprint_html()
+    return HTML(string=html_str, base_url=str(_PDF_TEMPLATE_DIR)).write_pdf()
+
+
+# ── Mini Janma Patrika (micro details + D1 chart) ────────────────────────────
+
+def generate_mini_mr_pdf(
+    birth: BirthData,
+    person_name: str | None = None,
+    place_name: str | None = None,
+    gender: str | None = None,
+    gotra: str | None = None,
+    parents: str | None = None,
+    astrologer_name: str | None = None,
+    astrologer_credentials: str | None = None,
+) -> bytes:
+    """Mini Janma Patrika: all micro fields + D1 chart. Custom ~A5 size."""
+    T = get_translator("mr")
+    chart   = calculate_chart(birth)
+    panchang = calculate_panchang(
+        birth.year, birth.month, birth.day,
+        birth.hour, birth.minute, birth.second, birth.utc_offset,
+    )
+    all_dasha = calculate_dasha(chart)
+
+    moon  = next((p for p in chart.planets if p.name == "Moon"), None)
+    sun   = next((p for p in chart.planets if p.name == "Sun"),  None)
+    lagna = chart.lagna
+    lagna_rashi_idx = int(lagna.longitude / 30) % 12
+
+    # D1 chart data
+    d1_houses: dict[int, list[str]] = {i: [] for i in range(1, 13)}
+    for p in chart.planets:
+        d1_houses[p.house].append(_MR_PLANET_SHORT.get(p.name, p.name[:2]))
+    d1_chart = _build_ni_chart_data(d1_houses, lagna_rashi_idx, T)
+
+    # Nakshatra attrs
+    nak_idx  = NAKSHATRAS.index(moon.nakshatra) if moon and moon.nakshatra in NAKSHATRAS else None
+    gana_mr  = _MR_GANA.get(NAKSHATRA_GANA[nak_idx], "—") if nak_idx is not None else "—"
+    yoni_mr  = _MR_YONI.get(NAKSHATRA_YONI[nak_idx], "—") if nak_idx is not None else "—"
+    nadi_mr  = _MR_NADI.get(nak_idx % 3, "—") if nak_idx is not None else "—"
+    varna_mr = _MR_VARNA.get(RASHI_VARNA.get(moon.rashi, ""), "—") if moon else "—"
+    paya_mr  = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
+    janmakshara = ", ".join(NAKSHATRA_JANMAKSHARA[nak_idx]) if nak_idx is not None else "—"
+
+    moon_rashi_lord = RASHI_LORD.get(moon.rashi, "") if moon else ""
+    rashi_swami_mr  = _MR_RASHI_LORD.get(moon_rashi_lord, moon_rashi_lord)
+    ratna_mr        = _MR_RATNA.get(PLANET_RATNA.get(moon_rashi_lord, ""), "—")
+    lagna_rashi_mr  = T(f"rashi.{lagna.rashi}") if lagna else "—"
+    moon_rashi_mr   = T(f"rashi.{moon.rashi}") if moon else "—"
+    sun_rashi_mr    = T(f"rashi.{sun.rashi}") if sun else "—"
+    moon_nak_mr     = T(f"nakshatra.{moon.nakshatra}") if moon else "—"
+
+    # Current maha + current antar only
+    from datetime import datetime as dt
+    now = dt.now()
+    maha_lord_mr = maha_range = antar_lord_mr = antar_range = "—"
+    for maha_lord, maha_start, maha_end, antars in all_dasha:
+        if maha_start <= now <= maha_end:
+            maha_lord_mr = T(f"planet.{maha_lord}")
+            maha_range   = (
+                f"{_to_dev(str(maha_start.year))} – {_to_dev(str(maha_end.year))}"
+            )
+            for a_lord, a_start, a_end in antars:
+                if a_start <= now <= a_end:
+                    antar_lord_mr = T(f"planet.{a_lord}")
+                    antar_range   = (
+                        f"{_to_dev(_MR_MONTHS_SHORT[a_start.month-1])} {_to_dev(str(a_start.year))} – "
+                        f"{_to_dev(_MR_MONTHS_SHORT[a_end.month-1])} {_to_dev(str(a_end.year))}"
+                    )
+                    break
+            break
+
+    # Panchang
+    paksha     = _MR_PAKSHA.get(panchang["paksha"], panchang["paksha"])
+    tithi_name = panchang["tithi"].split(" ", 1)[-1]
+    tithi_mr   = f"{paksha} {_MR_TITHI.get(tithi_name, tithi_name)}"
+    vara_mr    = _MR_VARA.get(panchang["vara"], panchang["vara"])
+    yoga_mr    = _MR_YOGA.get(panchang["yoga"], panchang["yoga"])
+    karana_mr  = _MR_KARANA.get(panchang["karana"], panchang["karana"])
+
+    birth_date_dev = _to_dev(f"{birth.day:02d}/{birth.month:02d}/{birth.year}")
+    birth_time_dev = _to_dev(f"{birth.hour:02d}:{birth.minute:02d}")
+    lat = getattr(birth, "latitude", None)
+    lon = getattr(birth, "longitude", None)
+    latlon = (
+        f"{_to_dev(f'{abs(lat):.2f}')}° {'उ' if lat >= 0 else 'द'} / "
+        f"{_to_dev(f'{abs(lon):.2f}')}° {'पू' if lon >= 0 else 'प'}"
+    ) if lat is not None and lon is not None else "—"
+    today = _to_dev(now.strftime(f"%-d {_MR_MONTHS_SHORT[now.month-1]} %Y"))
+
+    from jinja2 import Environment, FileSystemLoader
+    env  = Environment(loader=FileSystemLoader(str(_PDF_TEMPLATE_DIR)))
+    tmpl = env.get_template("mini_mr.html")
+    html_str = tmpl.render(
+        person_name=person_name or "—",
+        place=place_name or "—",
+        gender=gender or "—",
+        gotra=gotra or "—",
+        parents=parents or "—",
+        birth_date_dev=birth_date_dev,
+        birth_time_dev=birth_time_dev,
+        latlon=latlon,
+        tithi=tithi_mr, vara=vara_mr, yoga=yoga_mr, karana=karana_mr,
+        moon_rashi=moon_rashi_mr,
+        sun_rashi=sun_rashi_mr,
+        lagna_rashi=lagna_rashi_mr,
+        nakshatra=moon_nak_mr,
+        charan=_to_dev(str(moon.nakshatra_pada)) if moon else "—",
+        janmakshara=janmakshara,
+        gana_yoni=f"{gana_mr} / {yoni_mr}",
+        nadi_varna=f"{nadi_mr} / {varna_mr}",
+        paya=paya_mr,
+        sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
+        rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
+        maha_lord=maha_lord_mr, maha_range=maha_range,
+        antar_lord=antar_lord_mr, antar_range=antar_range,
+        d1_chart=d1_chart,
+        today=today,
         astrologer_name=astrologer_name or "",
         astrologer_credentials=astrologer_credentials or "",
     )
