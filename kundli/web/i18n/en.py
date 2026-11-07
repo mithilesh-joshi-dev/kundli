@@ -8,6 +8,7 @@ TRANSLATIONS = {
     "ui.predictions": "Predictions",
     "ui.transit": "Transits",
     "ui.matching": "Matching",
+    "ui.profile": "Profile",
     "ui.generate": "Generate",
     "ui.download_pdf": "Download PDF",
     "ui.name": "Name",
