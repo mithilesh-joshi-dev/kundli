@@ -104,9 +104,24 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
+        detail = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
         if _is_htmx(request):
-            detail = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
             return _htmx_error_response(detail, exc.status_code)
+        if exc.status_code == 403:
+            html = f"""<!DOCTYPE html>
+<html lang="mr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>परवानगी नाही — कुंडली</title>
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="min-h-screen bg-amber-50 flex items-center justify-center p-4">
+<div class="text-center max-w-sm">
+  <div class="text-5xl mb-4">🔒</div>
+  <h1 class="text-xl font-bold text-gray-900 mb-2">परवानगी नाही</h1>
+  <p class="text-sm text-gray-500 mb-6">{detail}</p>
+  <a href="/" class="inline-block bg-orange-600 text-white text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-orange-700 transition">मुख्यपृष्ठावर जा</a>
+</div>
+</body></html>"""
+            return HTMLResponse(content=html, status_code=403)
         return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
     @app.exception_handler(ValueError)

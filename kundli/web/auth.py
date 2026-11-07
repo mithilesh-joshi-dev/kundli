@@ -117,3 +117,11 @@ async def update_user_features(uid: str, features: list[str]) -> None:
     await client.collection("jyotishacharyas").document(uid).update({
         "features": features,
     })
+
+
+async def update_user_approval(uid: str, approved: bool) -> None:
+    from google.cloud.firestore_v1 import AsyncClient
+    client = AsyncClient()
+    await client.collection("jyotishacharyas").document(uid).update({
+        "approved": approved,
+    })
