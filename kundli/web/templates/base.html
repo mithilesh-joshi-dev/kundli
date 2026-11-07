@@ -79,6 +79,11 @@
 
         /* Smooth horizontal scroll */
         .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+
+        /* PDF share vs download icon visibility */
+        .pdf-share-icon { display: none; }
+        .can-share .pdf-dl-icon { display: none; }
+        .can-share .pdf-share-icon { display: inline-flex; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-orange-50/40 via-white to-amber-50/30 min-h-screen pb-16 md:pb-0">
@@ -213,6 +218,50 @@
             event.detail.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     });
+
+    // PDF Web Share API
+    (function() {
+        const canShare = typeof navigator.share === 'function' && typeof navigator.canShare === 'function';
+        if (canShare) document.body.classList.add('can-share');
+
+        document.addEventListener('submit', async function(e) {
+            const form = e.target;
+            if (!form.dataset.pdfShare) return;
+            if (!canShare) return;
+
+            e.preventDefault();
+
+            const btn = form.querySelector('button[type="submit"]');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg style="width:14px;height:14px;animation:spin 0.8s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>तयार होत आहे...</span>';
+
+            try {
+                const res = await fetch('/api/pdf/chart', { method: 'POST', body: new FormData(form) });
+                if (!res.ok) throw new Error('PDF generation failed');
+                const blob = await res.blob();
+                const filename = form.dataset.pdfShare;
+                const file = new File([blob], filename, { type: 'application/pdf' });
+
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file] });
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = filename; a.click();
+                    URL.revokeObjectURL(url);
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    form.removeAttribute('data-pdf-share');
+                    form.submit();
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        });
+    })();
     </script>
 </body>
 </html>
