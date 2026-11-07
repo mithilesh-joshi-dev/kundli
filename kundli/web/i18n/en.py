@@ -94,6 +94,9 @@ TRANSLATIONS = {
     "planet.Saturn": "Saturn",
     "planet.Rahu": "Rahu",
     "planet.Ketu": "Ketu",
+    "planet.Uranus": "Uranus",
+    "planet.Neptune": "Neptune",
+    "planet.Pluto": "Pluto",
     "planet.Lagna": "Lagna (Ascendant)",
 
     # === Nakshatras ===

@@ -126,6 +126,7 @@ _MR_PAYA = {
 _MR_PLANET_SHORT = {
     "Sun": "सू", "Moon": "चं", "Mars": "मं", "Mercury": "बु",
     "Jupiter": "गु", "Venus": "शु", "Saturn": "श", "Rahu": "रा", "Ketu": "के",
+    "Uranus": "यु", "Neptune": "ने", "Pluto": "प्लु",
 }
 
 _MR_VARA = {
