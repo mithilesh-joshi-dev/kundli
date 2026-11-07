@@ -149,6 +149,9 @@ PLANETS = {
     "Saturn": swe.SATURN,
     "Rahu": swe.MEAN_NODE,
     "Ketu": None,  # Derived: Rahu + 180
+    "Uranus": swe.URANUS,
+    "Neptune": swe.NEPTUNE,
+    "Pluto": swe.PLUTO,
 }
 
 AYANAMSHA = swe.SIDM_LAHIRI
