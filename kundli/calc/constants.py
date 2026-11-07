@@ -72,35 +72,40 @@ PLANET_RATNA = {
     "Saturn": "Neelam", "Rahu": "Gomed", "Ketu": "Lahsuniya",
 }
 
-# Paya (metal) per nakshatra — repeating 4-step cycle: Swarna, Rajat, Tamra, Loh
+# Paya (metal) per nakshatra — traditional Jyotish grouping (not a cyclic formula)
+# Source: Marathi Jyotish texts
+# Swarna(6): Revati,Ashwini,Bharani,Krittika,Rohini,Mrigashira
+# Rajat(10): Ardra,Punarvasu,Pushya,Ashlesha,Magha,PurvaPhalguni,UttaraPhalguni,Hasta,Chitra,Swati
+# Tamra(9):  Vishakha,Anuradha,Jyeshtha,Moola,PurvaAshadha,UttaraAshadha,Shravana,Dhanishta,Shatabhisha
+# Loh(2):    PurvaBhadrapada,UttaraBhadrapada
 NAKSHATRA_PAYA = (
     "Swarna",  # Ashwini
-    "Rajat",   # Bharani
-    "Tamra",   # Krittika
-    "Loh",     # Rohini
+    "Swarna",  # Bharani
+    "Swarna",  # Krittika
+    "Swarna",  # Rohini
     "Swarna",  # Mrigashira
     "Rajat",   # Ardra
-    "Tamra",   # Punarvasu
-    "Loh",     # Pushya
-    "Swarna",  # Ashlesha
+    "Rajat",   # Punarvasu
+    "Rajat",   # Pushya
+    "Rajat",   # Ashlesha
     "Rajat",   # Magha
-    "Tamra",   # Purva Phalguni
-    "Loh",     # Uttara Phalguni
-    "Swarna",  # Hasta
+    "Rajat",   # Purva Phalguni
+    "Rajat",   # Uttara Phalguni
+    "Rajat",   # Hasta
     "Rajat",   # Chitra
-    "Tamra",   # Swati
-    "Loh",     # Vishakha
-    "Swarna",  # Anuradha
-    "Rajat",   # Jyeshtha
+    "Rajat",   # Swati
+    "Tamra",   # Vishakha
+    "Tamra",   # Anuradha
+    "Tamra",   # Jyeshtha
     "Tamra",   # Moola
-    "Loh",     # Purva Ashadha
-    "Swarna",  # Uttara Ashadha
-    "Rajat",   # Shravana
+    "Tamra",   # Purva Ashadha
+    "Tamra",   # Uttara Ashadha
+    "Tamra",   # Shravana
     "Tamra",   # Dhanishta
-    "Loh",     # Shatabhisha
-    "Swarna",  # Purva Bhadrapada
-    "Rajat",   # Uttara Bhadrapada
-    "Tamra",   # Revati
+    "Tamra",   # Shatabhisha
+    "Loh",     # Purva Bhadrapada
+    "Loh",     # Uttara Bhadrapada
+    "Swarna",  # Revati
 )
 
 # Janmakshara: 4 syllables per nakshatra (one per pada), Devanagari
