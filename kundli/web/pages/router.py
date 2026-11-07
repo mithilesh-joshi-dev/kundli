@@ -198,6 +198,34 @@ async def admin_page(request: Request):
     return request.app.state.templates.TemplateResponse(request, name="pages/admin.html", context=ctx)
 
 
+@router.post("/admin/users/{uid}/approve", response_class=HTMLResponse)
+async def admin_approve_user(uid: str, request: Request):
+    profile = getattr(request.state, "profile", None)
+    if not profile or not profile.get("is_admin"):
+        from fastapi import HTTPException
+        raise HTTPException(403, "Admin access required")
+    from ..auth import update_user_approval
+    form = await request.form()
+    approved = form.get("approved") == "1"
+    await update_user_approval(uid, approved)
+    if approved:
+        return HTMLResponse(
+            f'<button hx-post="/admin/users/{uid}/approve" hx-vals=\'{{"approved":"0"}}\' '
+            f'hx-target="#approval-{uid}" hx-swap="outerHTML" '
+            f'class="text-[10px] font-medium bg-green-50 text-green-700 border border-green-200 '
+            f'rounded-full px-2 py-0.5 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition cursor-pointer" '
+            f'id="approval-{uid}">✓ Approved</button>'
+        )
+    else:
+        return HTMLResponse(
+            f'<button hx-post="/admin/users/{uid}/approve" hx-vals=\'{{"approved":"1"}}\' '
+            f'hx-target="#approval-{uid}" hx-swap="outerHTML" '
+            f'class="text-[10px] font-medium bg-orange-50 text-orange-600 border border-orange-100 '
+            f'rounded-full px-2 py-0.5 hover:bg-green-50 hover:text-green-700 hover:border-green-200 transition cursor-pointer" '
+            f'id="approval-{uid}">⏳ Pending</button>'
+        )
+
+
 @router.post("/admin/users/{uid}/features", response_class=HTMLResponse)
 async def admin_update_user_features(uid: str, request: Request):
     profile = getattr(request.state, "profile", None)
