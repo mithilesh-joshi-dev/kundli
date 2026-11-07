@@ -8,6 +8,7 @@ TRANSLATIONS = {
     "ui.predictions": "भविष्यफल",
     "ui.transit": "गोचर",
     "ui.matching": "कुंडली जुळवणी",
+    "ui.profile": "प्रोफाइल",
     "ui.generate": "तयार करा",
     "ui.download_pdf": "PDF डाउनलोड करा",
     "ui.name": "जन्मनाव",

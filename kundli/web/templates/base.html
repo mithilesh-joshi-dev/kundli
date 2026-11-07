@@ -162,7 +162,7 @@
 
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 safe-area-bottom">
-        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", "chart" in user_features), ("predict", "/predict", "ui.predictions", "⭐", features.predict and "predict" in user_features), ("transit", "/transit", "ui.transit", "🌙", features.transit and "transit" in user_features), ("match", "/match", "ui.matching", "❤️", features.matching and "match" in user_features), ("questions", "/questions", "ui.questions", "🔮", features.questions and "questions" in user_features)] %}
+        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", "chart" in user_features), ("predict", "/predict", "ui.predictions", "⭐", features.predict and "predict" in user_features), ("transit", "/transit", "ui.transit", "🌙", features.transit and "transit" in user_features), ("match", "/match", "ui.matching", "❤️", features.matching and "match" in user_features), ("questions", "/questions", "ui.questions", "🔮", features.questions and "questions" in user_features), ("profile", "/profile", "ui.profile", "👤", true)] %}
         {% set active_nav = mobile_nav|selectattr(4)|list %}
         <div class="flex h-14">
             {% for id, path, key, icon, enabled in active_nav %}
