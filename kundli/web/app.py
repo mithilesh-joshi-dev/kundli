@@ -33,7 +33,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return RedirectResponse("/login", status_code=302)
 
         try:
-            from .auth import verify_session, get_profile
+            from .auth import verify_session, get_profile, ALL_FEATURES
             claims = verify_session(cookie)
             request.state.user = claims
             # Attach Firestore profile (non-blocking best-effort)
@@ -43,8 +43,14 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 # Redirect unapproved users to pending page
                 if path != "/pending" and (not profile or not profile.get("approved")):
                     return RedirectResponse("/pending", status_code=302)
+                # Resolve per-user feature set.
+                # None (field missing) = legacy user = all features.
+                # [] = new user = no features until admin grants.
+                raw = profile.get("features") if profile else None
+                request.state.user_features = set(ALL_FEATURES) if raw is None else set(raw)
             except Exception:
                 request.state.profile = None
+                request.state.user_features = set(ALL_FEATURES)
         except Exception:
             response = RedirectResponse("/login", status_code=302)
             response.delete_cookie("__session")
