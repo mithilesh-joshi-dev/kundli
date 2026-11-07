@@ -1,6 +1,8 @@
 """PDF chart download endpoint — accepts HTML form submissions."""
 
+import asyncio
 import unicodedata
+from functools import partial
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
@@ -63,16 +65,24 @@ async def pdf_chart_form(
         from fastapi import HTTPException
         raise HTTPException(403, "या पत्रिकेसाठी परवानगी नाही. कृपया प्रशासकाशी संपर्क साधा.")
 
+    # Build the synchronous generator callable, then run it off the event loop.
+    # write_pdf() is CPU-bound (Pango text shaping + layout); keeping it on the
+    # event loop would stall all other requests during generation.
+    loop = asyncio.get_running_loop()
     if report_type == "micro":
-        pdf_bytes = generate_micro_mr_pdf(birth, **kwargs) if lang == "mr" else generate_micro_pdf(birth, person_name=body.name or None, place_name=body.place or None)
+        fn = (partial(generate_micro_mr_pdf, birth, **kwargs) if lang == "mr"
+              else partial(generate_micro_pdf, birth, person_name=body.name or None, place_name=body.place or None))
     elif report_type == "mini":
-        pdf_bytes = generate_mini_mr_pdf(birth, **kwargs) if lang == "mr" else generate_micro_pdf(birth, person_name=body.name or None, place_name=body.place or None)
+        fn = (partial(generate_mini_mr_pdf, birth, **kwargs) if lang == "mr"
+              else partial(generate_micro_pdf, birth, person_name=body.name or None, place_name=body.place or None))
     elif report_type == "full":
         from fastapi import HTTPException
         raise HTTPException(400, "Full Janma Patrika लवकरच उपलब्ध होईल.")
     else:
         from fastapi import HTTPException
         raise HTTPException(400, f"Report type '{report_type}' not yet available.")
+
+    pdf_bytes = await loop.run_in_executor(None, fn)
 
     raw = body.name or "chart"
     ascii_name = unicodedata.normalize("NFKD", raw).encode("ascii", "ignore").decode() or "chart"
