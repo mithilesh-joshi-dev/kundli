@@ -23,7 +23,14 @@
     {% endset %}
 
     <div class="flex flex-wrap gap-2">
-      {# Micro #}
+      {% set _dl_icon %}
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/>
+      </svg>
+      {% endset %}
+
+      {# Micro PDF #}
+      {% if "pdf_micro" in user_features %}
       <form action="/api/pdf/chart" method="post" target="_blank">
         {{ _pdf_fields }}
         <input type="hidden" name="report_type" value="micro">
@@ -31,14 +38,13 @@
                 class="inline-flex items-center gap-1.5 text-xs font-semibold
                        bg-amber-100 hover:bg-amber-200 text-amber-800
                        border border-amber-200 rounded-xl px-3 py-1.5 transition active:scale-95">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/>
-          </svg>
-          संक्षिप्त पत्रिका
+          {{ _dl_icon }}संक्षिप्त पत्रिका
         </button>
       </form>
+      {% endif %}
 
-      {# Mini #}
+      {# Mini PDF #}
+      {% if "pdf_mini" in user_features %}
       <form action="/api/pdf/chart" method="post" target="_blank">
         {{ _pdf_fields }}
         <input type="hidden" name="report_type" value="mini">
@@ -46,23 +52,20 @@
                 class="inline-flex items-center gap-1.5 text-xs font-semibold
                        bg-saffron-100 hover:bg-saffron-200 text-saffron-800
                        border border-saffron-200 rounded-xl px-3 py-1.5 transition active:scale-95">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/>
-          </svg>
-          कुंडलीसह पत्रिका
+          {{ _dl_icon }}कुंडलीसह पत्रिका
         </button>
       </form>
+      {% endif %}
 
-      {# Full — coming soon #}
+      {# Full PDF — coming soon, only shown if feature enabled or user has pdf_full #}
+      {% if "pdf_full" in user_features %}
       <button disabled title="लवकरच उपलब्ध"
               class="inline-flex items-center gap-1.5 text-xs font-semibold
                      bg-gray-100 text-gray-400 border border-gray-200
                      rounded-xl px-3 py-1.5 cursor-not-allowed opacity-60">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/>
-        </svg>
-        संपूर्ण पत्रिका (लवकरच)
+        {{ _dl_icon }}संपूर्ण पत्रिका (लवकरच)
       </button>
+      {% endif %}
     </div>
 </div>
 

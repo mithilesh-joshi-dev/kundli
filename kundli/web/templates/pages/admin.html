@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">वापरकर्ता व्यवस्थापन</h1>
+    <p class="text-sm text-gray-500 mt-1">प्रत्येक जोतिषाचार्यासाठी वैशिष्ट्ये सक्रिय / निष्क्रिय करा</p>
+  </div>
+
+  <!-- Feature legend -->
+  <div class="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-5 flex flex-wrap gap-3">
+    {% for f in all_features %}
+    <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-800">
+      <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+      {{ feature_labels[f] }}
+    </span>
+    {% endfor %}
+  </div>
+
+  <!-- User cards -->
+  <div class="space-y-4">
+    {% for user in users %}
+    {% set uid = user.uid %}
+    {% set u_features = user.get("features") %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <!-- User info row -->
+      <div class="flex items-center justify-between px-5 py-3 border-b border-gray-50">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-saffron-100 flex items-center justify-center text-saffron-700 font-bold text-sm flex-shrink-0">
+            {{ (user.display_name or user.name or "?")[0] | upper }}
+          </div>
+          <div>
+            <div class="font-semibold text-gray-800 text-sm">{{ user.display_name or user.name or "—" }}</div>
+            <div class="text-xs text-gray-400">{{ user.email or "—" }}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          {% if u_features is none %}
+          <span class="text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-2 py-0.5">Legacy</span>
+          {% endif %}
+          {% if user.approved %}
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 border border-green-100 rounded-full px-2 py-0.5">✓ Approved</span>
+          {% else %}
+          <span class="text-[10px] font-medium bg-orange-50 text-orange-600 border border-orange-100 rounded-full px-2 py-0.5">⏳ Pending</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Feature toggles + save -->
+      <form hx-post="/admin/users/{{ uid }}/features"
+            hx-target="#saved-{{ uid }}"
+            hx-swap="innerHTML"
+            class="px-5 py-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 mb-4">
+          {% for f in all_features %}
+          {% set is_checked = u_features is none or f in u_features %}
+          <label class="flex items-center gap-2 cursor-pointer group select-none">
+            <div class="relative flex-shrink-0">
+              <input type="checkbox"
+                     name="{{ f }}"
+                     value="1"
+                     {% if is_checked %}checked{% endif %}
+                     class="sr-only peer">
+              <div class="w-8 h-4 bg-gray-200 rounded-full peer-checked:bg-saffron-500 transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <span class="text-xs font-medium text-gray-600 group-hover:text-gray-900 transition-colors leading-tight">
+              {{ feature_labels[f] }}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="submit"
+                  class="text-xs font-semibold bg-saffron-500 hover:bg-saffron-600 text-white
+                         rounded-xl px-4 py-1.5 transition active:scale-95">
+            सेव करा
+          </button>
+          <span id="saved-{{ uid }}" class="text-xs text-green-600 font-medium"></span>
+        </div>
+      </form>
+
+    </div>
+    {% else %}
+    <div class="text-center py-12 text-gray-400 text-sm">कोणताही वापरकर्ता नाही</div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

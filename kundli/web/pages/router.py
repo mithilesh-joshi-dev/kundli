@@ -62,10 +62,12 @@ def _build_north_indian_chart(chart, lagna_rashi_idx: int, T) -> list[dict]:
 
 def _ctx(request: Request, page: str = "home", **kwargs):
     """Build template context with lang, T, and common vars."""
+    from ..auth import ALL_FEATURES
     lang = request.query_params.get("lang", settings.app.default_lang)
     T = get_translator(lang)
     user = getattr(request.state, "user", None)
     profile = getattr(request.state, "profile", None)
+    user_features = getattr(request.state, "user_features", None) or set(ALL_FEATURES)
     return {
         "request": request,
         "lang": lang,
@@ -73,10 +75,20 @@ def _ctx(request: Request, page: str = "home", **kwargs):
         "page": page,
         "languages": SUPPORTED_LANGUAGES,
         "features": settings.features,
+        "user_features": user_features,
         "current_user": user,
         "user_profile": profile,
         **kwargs,
     }
+
+
+def _require_feature(request: Request, feature: str):
+    """Raise 403 if the signed-in user does not have access to this feature."""
+    from fastapi import HTTPException
+    from ..auth import ALL_FEATURES
+    user_features = getattr(request.state, "user_features", None) or set(ALL_FEATURES)
+    if feature not in user_features:
+        raise HTTPException(403, "या वैशिष्ट्यासाठी परवानगी नाही. कृपया प्रशासकाशी संपर्क साधा.")
 
 
 # === Page Routes ===
@@ -135,33 +147,68 @@ async def home(request: Request):
 
 @router.get("/chart", response_class=HTMLResponse)
 async def chart_page(request: Request):
+    _require_feature(request, "chart")
     ctx = _ctx(request, "chart")
     return request.app.state.templates.TemplateResponse(request, name="pages/chart.html", context=ctx)
 
 
 @router.get("/predict", response_class=HTMLResponse)
 async def predict_page(request: Request):
+    _require_feature(request, "predict")
     ctx = _ctx(request, "predict")
     return request.app.state.templates.TemplateResponse(request, name="pages/predict.html", context=ctx)
 
 
 @router.get("/transit", response_class=HTMLResponse)
 async def transit_page(request: Request):
+    _require_feature(request, "transit")
     ctx = _ctx(request, "transit")
     return request.app.state.templates.TemplateResponse(request, name="pages/transit.html", context=ctx)
 
 
 @router.get("/match", response_class=HTMLResponse)
 async def match_page(request: Request):
+    _require_feature(request, "match")
     ctx = _ctx(request, "match")
     return request.app.state.templates.TemplateResponse(request, name="pages/match.html", context=ctx)
 
 
 @router.get("/questions", response_class=HTMLResponse)
 async def questions_page(request: Request):
+    _require_feature(request, "questions")
     from ...calc.events2 import EVENTS
     ctx = _ctx(request, "questions", events=EVENTS)
     return request.app.state.templates.TemplateResponse(request, name="pages/questions.html", context=ctx)
+
+
+# ── Admin routes ──────────────────────────────────────────────────────────────
+
+@router.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request):
+    profile = getattr(request.state, "profile", None)
+    if not profile or not profile.get("is_admin"):
+        from fastapi import HTTPException
+        raise HTTPException(403, "Admin access required")
+    from ..auth import get_all_users, ALL_FEATURES, FEATURE_LABELS
+    users = await get_all_users()
+    ctx = _ctx(request, "admin",
+               users=users,
+               all_features=ALL_FEATURES,
+               feature_labels=FEATURE_LABELS)
+    return request.app.state.templates.TemplateResponse(request, name="pages/admin.html", context=ctx)
+
+
+@router.post("/admin/users/{uid}/features", response_class=HTMLResponse)
+async def admin_update_user_features(uid: str, request: Request):
+    profile = getattr(request.state, "profile", None)
+    if not profile or not profile.get("is_admin"):
+        from fastapi import HTTPException
+        raise HTTPException(403, "Admin access required")
+    from ..auth import update_user_features, ALL_FEATURES
+    form = await request.form()
+    features = [f for f in ALL_FEATURES if form.get(f)]
+    await update_user_features(uid, features)
+    return HTMLResponse('<span class="text-xs font-semibold text-green-600">✓ सेव झाले</span>')
 
 
 # === HTMX Partial Routes (return rendered HTML fragments) ===
@@ -202,6 +249,8 @@ async def chart_results(request: Request):
         "lat": body.lat, "lon": body.lon, "utc_offset": body.utc_offset,
     })
 
+    from ..auth import ALL_FEATURES
+    user_features = getattr(request.state, "user_features", None) or set(ALL_FEATURES)
     ctx = {
         "request": request,
         "T": T,
@@ -213,6 +262,7 @@ async def chart_results(request: Request):
         "gender": gender or "",
         "gotra": gotra or "",
         "parents": parents or "",
+        "user_features": user_features,
     }
     return request.app.state.templates.TemplateResponse(request, name="partials/chart_results.html", context=ctx)
 

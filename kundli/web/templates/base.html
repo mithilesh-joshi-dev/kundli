@@ -94,7 +94,7 @@
                 <div class="flex gap-1">
                     {% set nav_items = [("chart", "ui.chart", true), ("predict", "ui.predictions", features.predict), ("transit", "ui.transit", features.transit), ("match", "ui.matching", features.matching), ("questions", "ui.questions", features.questions)] %}
                     {% for path, key, enabled in nav_items %}
-                    {% if enabled %}
+                    {% if enabled and path in user_features %}
                     <a href="/{{ path }}?lang={{ lang }}"
                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition
                               {% if page == path %}bg-saffron-100 text-saffron-800{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
@@ -114,6 +114,13 @@
                 </div>
                 {% if current_user %}
                 <div class="flex items-center gap-2 pl-2 border-l border-gray-200">
+                    {% if user_profile and user_profile.is_admin %}
+                    <a href="/admin"
+                       class="text-xs font-medium px-2 py-1 rounded-lg transition
+                              {% if page == 'admin' %}bg-saffron-100 text-saffron-700{% else %}text-gray-400 hover:text-saffron-600 hover:bg-saffron-50{% endif %}">
+                        Admin
+                    </a>
+                    {% endif %}
                     <a href="/profile" class="text-xs text-gray-500 hover:text-saffron-700 max-w-[120px] truncate transition">
                         {{ (user_profile.display_name if user_profile else current_user.get("name", "")) }}
                     </a>
@@ -155,7 +162,7 @@
 
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 safe-area-bottom">
-        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", true), ("predict", "/predict", "ui.predictions", "⭐", features.predict), ("transit", "/transit", "ui.transit", "🌙", features.transit), ("match", "/match", "ui.matching", "❤️", features.matching), ("questions", "/questions", "ui.questions", "🔮", features.questions)] %}
+        {% set mobile_nav = [("home", "/", "ui.home", "🏠", true), ("chart", "/chart", "ui.chart", "🪐", "chart" in user_features), ("predict", "/predict", "ui.predictions", "⭐", features.predict and "predict" in user_features), ("transit", "/transit", "ui.transit", "🌙", features.transit and "transit" in user_features), ("match", "/match", "ui.matching", "❤️", features.matching and "match" in user_features), ("questions", "/questions", "ui.questions", "🔮", features.questions and "questions" in user_features)] %}
         {% set active_nav = mobile_nav|selectattr(4)|list %}
         <div class="flex h-14">
             {% for id, path, key, icon, enabled in active_nav %}

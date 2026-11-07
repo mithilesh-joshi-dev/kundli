@@ -55,6 +55,14 @@ async def pdf_chart_form(
         astrologer_credentials=astrologer_cred or None,
     )
 
+    # Feature gate
+    from ..auth import ALL_FEATURES
+    user_features = getattr(request.state, "user_features", None) or set(ALL_FEATURES)
+    feature_key = f"pdf_{report_type}"
+    if feature_key not in user_features:
+        from fastapi import HTTPException
+        raise HTTPException(403, "या पत्रिकेसाठी परवानगी नाही. कृपया प्रशासकाशी संपर्क साधा.")
+
     if report_type == "micro":
         pdf_bytes = generate_micro_mr_pdf(birth, **kwargs) if lang == "mr" else generate_micro_pdf(birth, person_name=body.name or None, place_name=body.place or None)
     elif report_type == "mini":

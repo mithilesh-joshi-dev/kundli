@@ -6,6 +6,28 @@ from typing import Any
 
 logger = logging.getLogger("kundli.auth")
 
+ALL_FEATURES = (
+    "chart",
+    "predict",
+    "transit",
+    "match",
+    "questions",
+    "pdf_micro",
+    "pdf_mini",
+    "pdf_full",
+)
+
+FEATURE_LABELS = {
+    "chart":     "कुंडली",
+    "predict":   "भविष्य",
+    "transit":   "गोचर",
+    "match":     "मिलान",
+    "questions": "प्रश्न",
+    "pdf_micro": "संक्षिप्त PDF",
+    "pdf_mini":  "कुंडलीसह PDF",
+    "pdf_full":  "संपूर्ण PDF",
+}
+
 _firebase_app = None
 
 
@@ -75,4 +97,23 @@ async def update_profile(uid: str, display_name: str, credentials: str) -> None:
     await client.collection("jyotishacharyas").document(uid).update({
         "display_name": display_name,
         "credentials": credentials,
+    })
+
+
+async def get_all_users() -> list[dict[str, Any]]:
+    """Return all jyotishacharya profiles, sorted by display_name."""
+    from google.cloud.firestore_v1 import AsyncClient
+    client = AsyncClient()
+    users = []
+    async for doc in client.collection("jyotishacharyas").stream():
+        users.append(doc.to_dict())
+    users.sort(key=lambda u: (u.get("display_name") or u.get("name") or "").lower())
+    return users
+
+
+async def update_user_features(uid: str, features: list[str]) -> None:
+    from google.cloud.firestore_v1 import AsyncClient
+    client = AsyncClient()
+    await client.collection("jyotishacharyas").document(uid).update({
+        "features": features,
     })
