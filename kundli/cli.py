@@ -4,9 +4,10 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from .calc.analysis import build_analysis
 from .calc.engine import calculate_chart
 from .calc.geocode import fuzzy_search, lookup_city
-from .calc.predict import generate_predictions
+from .calc.predict2 import generate_predictions
 from .calc.transit import calculate_transits
 from .display.terminal import print_chart, print_matching, print_predictions
 from .models import BirthData
@@ -165,7 +166,8 @@ def predict(
     """Predict future based on Dasha + Transit + Natal strength."""
     birth = _parse_birth(date, time, lat, lon, place, utc_offset)
     result = calculate_chart(birth)
-    predictions, bav, sav = generate_predictions(result, start, end)
+    ana = build_analysis(result)
+    predictions, bav, sav = generate_predictions(ana, start, end)
     print_predictions(result, predictions, bav, sav)
 
 

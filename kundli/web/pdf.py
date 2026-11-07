@@ -816,19 +816,3 @@ def generate_mini_mr_pdf(
     )
 
 
-# ── Future tiers ──────────────────────────────────────────────────────────────
-
-def generate_mini_pdf(
-    birth: BirthData,
-    person_name: str | None = None,
-    place_name: str | None = None,
-) -> bytes:
-    raise NotImplementedError("Mini PDF coming soon")
-
-
-def generate_full_pdf(
-    birth: BirthData,
-    person_name: str | None = None,
-    place_name: str | None = None,
-) -> bytes:
-    raise NotImplementedError("Full PDF coming soon")
