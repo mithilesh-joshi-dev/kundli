@@ -156,7 +156,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-6">
+    <main class="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-6 pb-20 md:pb-6">
         {% block content %}{% endblock %}
     </main>
 
@@ -167,10 +167,12 @@
         <div class="flex h-14">
             {% for id, path, key, icon, enabled in active_nav %}
             <a href="{{ path }}?lang={{ lang }}"
-               class="flex-1 flex flex-col items-center justify-center text-xs font-medium transition min-w-0
+               class="flex-1 flex flex-col items-center justify-center text-xs font-medium transition min-w-0 px-0.5
                       {% if page == id %}bnav-active{% else %}text-gray-400{% endif %}">
-                <span class="text-lg leading-none mb-0.5">{{ icon }}</span>
-                <span class="truncate">{{ T(key) }}</span>
+                <span class="text-xl leading-none">{{ icon }}</span>
+                {% if active_nav|length <= 5 %}
+                <span class="truncate text-[10px] mt-0.5">{{ T(key) }}</span>
+                {% endif %}
             </a>
             {% endfor %}
         </div>
