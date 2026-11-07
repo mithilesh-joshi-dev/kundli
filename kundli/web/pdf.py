@@ -34,6 +34,29 @@ from .i18n import get_translator
 
 _PDF_TEMPLATE_DIR = Path(__file__).parent / "templates" / "pdf"
 
+# ── Module-level singletons (created once, reused across all requests) ────────
+
+# Jinja2 env: compiled templates are cached in-process — avoids re-parsing
+# and re-compiling the template bytecode on every PDF request.
+from jinja2 import Environment, FileSystemLoader as _FSL  # noqa: E402
+_jinja_env = Environment(loader=_FSL(str(_PDF_TEMPLATE_DIR)))
+
+# WeasyPrint FontConfiguration: holds the loaded font data and Pango font map.
+# NotoSerifDevanagari is large; loading it on every request adds ~300-600 ms.
+# Initialised lazily on first PDF call so the app starts fast.
+_font_config = None
+
+
+def _get_font_config():
+    global _font_config
+    if _font_config is None:
+        try:
+            from weasyprint.text.fonts import FontConfiguration  # noqa: PLC0415
+            _font_config = FontConfiguration()
+        except Exception:
+            pass
+    return _font_config
+
 # ── Marathi panchang translation dicts ───────────────────────────────────────
 
 _MR_PAKSHA = {"Shukla": "शुक्ल", "Krishna": "कृष्ण"}
@@ -624,10 +647,7 @@ def generate_micro_mr_pdf(
     birth_date_dev = _to_dev(birth_date)
     birth_time_dev = _to_dev(birth_time_short)
 
-    from jinja2 import Environment, FileSystemLoader  # noqa: PLC0415
-    env = Environment(loader=FileSystemLoader(str(_PDF_TEMPLATE_DIR)))
-    tmpl = env.get_template("micro_mr.html")
-
+    tmpl = _jinja_env.get_template("micro_mr.html")
     html_str = tmpl.render(
         today=date.today().strftime("%d %b %Y"),
         person_name=person_name or "",
@@ -667,7 +687,9 @@ def generate_micro_mr_pdf(
     )
 
     HTML = _weasyprint_html()
-    return HTML(string=html_str, base_url=str(_PDF_TEMPLATE_DIR)).write_pdf()
+    return HTML(string=html_str, base_url=str(_PDF_TEMPLATE_DIR)).write_pdf(
+        font_config=_get_font_config()
+    )
 
 
 # ── Mini Janma Patrika (micro details + D1 chart) ────────────────────────────
@@ -757,9 +779,7 @@ def generate_mini_mr_pdf(
     ) if lat is not None and lon is not None else "—"
     today = _to_dev(now.strftime(f"%-d {_MR_MONTHS_SHORT[now.month-1]} %Y"))
 
-    from jinja2 import Environment, FileSystemLoader
-    env  = Environment(loader=FileSystemLoader(str(_PDF_TEMPLATE_DIR)))
-    tmpl = env.get_template("mini_mr.html")
+    tmpl = _jinja_env.get_template("mini_mr.html")
     html_str = tmpl.render(
         person_name=person_name or "—",
         place=place_name or "—",
@@ -790,7 +810,9 @@ def generate_mini_mr_pdf(
     )
 
     HTML = _weasyprint_html()
-    return HTML(string=html_str, base_url=str(_PDF_TEMPLATE_DIR)).write_pdf()
+    return HTML(string=html_str, base_url=str(_PDF_TEMPLATE_DIR)).write_pdf(
+        font_config=_get_font_config()
+    )
 
 
 # ── Future tiers ──────────────────────────────────────────────────────────────
