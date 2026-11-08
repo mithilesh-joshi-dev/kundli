@@ -145,6 +145,9 @@ body {
 .br:nth-child(even) { background: rgba(251,244,228,0.55); }
 /* reuse .col-hdr, .dk, .dv */
 
+/* ── Suggested name — sub-line inside the जन्माक्षर row ──────────────────────── */
+.jnv-sub { font-size: 5.5pt; color: #C98A2C; margin-top: 2pt; line-height: 1.2; }
+
 /* ── Verification strip ──────────────────────────────────────────────────── */
 .verify {
   flex-shrink: 0;
@@ -244,7 +247,13 @@ body {
       <div class="dcol">
         <div class="col-hdr">ज्योतिष तपशील</div>
         <div class="dr"><span class="dk">जन्म रास</span><span class="dv">{{ moon_rashi }}</span></div>
-        <div class="dr"><span class="dk">जन्माक्षर</span><span class="dv">{{ janmakshara }}</span></div>
+        <div class="dr">
+          <span class="dk">जन्माक्षर</span>
+          <span class="dv">{{ janmakshara }}</span>
+          {% if janmanav and janmanav != "—" %}
+          <span class="jnv-sub">सुचवलेले नाव: {{ janmanav }}</span>
+          {% endif %}
+        </div>
         <div class="dr"><span class="dk">नक्षत्र / चरण</span><span class="dv">{{ nakshatra }} ({{ charan }})</span></div>
         <div class="dr"><span class="dk">गण / योनी</span><span class="dv">{{ gana_yoni }}</span></div>
         <div class="dr"><span class="dk">नाडी / वर्ण</span><span class="dv">{{ nadi_varna }}</span></div>

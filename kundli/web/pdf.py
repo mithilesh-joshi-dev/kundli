@@ -26,6 +26,7 @@ from ..calc.constants import (
     NAKSHATRA_PAYA,
     RASHI_VARNA, RASHI_LORD, PLANET_RATNA,
 )
+from ..calc.janmanav import JANMANAV
 from ..calc.dasha import calculate_dasha
 from ..calc.engine import calculate_chart
 from ..calc.panchang import calculate_panchang
@@ -56,6 +57,13 @@ def _get_font_config():
         except Exception:
             pass
     return _font_config
+
+def _gender_key(gender: str | None) -> str:
+    if not gender:
+        return "m"
+    g = gender.lower().strip()
+    return "f" if g in ("स्त्री", "female", "f", "महिला", "woman", "girl") else "m"
+
 
 # ── Marathi panchang translation dicts ───────────────────────────────────────
 
@@ -618,6 +626,10 @@ def generate_micro_mr_pdf(
     else:
         janmakshara = "—"
 
+    # Suggested name from janmakshar + gender
+    _gk = _gender_key(gender)
+    janmanav = JANMANAV.get(janmakshara, {}).get(_gk, "—") if janmakshara != "—" else "—"
+
     # Sun rashi
     sun = next((p for p in chart.planets if p.name == "Sun"), None)
     sun_rashi_mr = T(f"rashi.{sun.rashi}") if sun else "—"
@@ -677,6 +689,7 @@ def generate_micro_mr_pdf(
         nadi_varna=f"{nadi_mr} / {varna_mr}",
         paya=paya_mr,
         janmakshara=janmakshara,
+        janmanav=janmanav,
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
         latlon=latlon,
@@ -730,6 +743,7 @@ def generate_mini_mr_pdf(
     varna_mr = _MR_VARNA.get(RASHI_VARNA.get(moon.rashi, ""), "—") if moon else "—"
     paya_mr  = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
     janmakshara = NAKSHATRA_JANMAKSHARA[nak_idx][moon.nakshatra_pada - 1] if nak_idx is not None and moon else "—"
+    janmanav = JANMANAV.get(janmakshara, {}).get(_gender_key(gender), "—") if janmakshara != "—" else "—"
 
     moon_rashi_lord = RASHI_LORD.get(moon.rashi, "") if moon else ""
     rashi_swami_mr  = _MR_RASHI_LORD.get(moon_rashi_lord, moon_rashi_lord)
@@ -794,6 +808,7 @@ def generate_mini_mr_pdf(
         nakshatra=moon_nak_mr,
         charan=_to_dev(str(moon.nakshatra_pada)) if moon else "—",
         janmakshara=janmakshara,
+        janmanav=janmanav,
         gana_yoni=f"{gana_mr} / {yoni_mr}",
         nadi_varna=f"{nadi_mr} / {varna_mr}",
         paya=paya_mr,
