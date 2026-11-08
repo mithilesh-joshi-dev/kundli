@@ -145,17 +145,8 @@ body {
 .br:nth-child(even) { background: rgba(251,244,228,0.55); }
 /* reuse .col-hdr, .dk, .dv */
 
-/* ── Suggested name strip ────────────────────────────────────────────────── */
-.janmanav-strip {
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 4pt; padding: 5pt 10pt;
-  border: 0.7pt solid #C98A2C;
-  box-shadow: inset 0 0 0 1pt rgba(201, 138, 44, 0.25);
-  background: linear-gradient(135deg, #FDF8ED 0%, #FFF5E0 50%, #FDF8ED 100%);
-}
-.jnv-label { font-size: 6pt; color: #58413E; letter-spacing: 0.2pt; }
-.jnv-value { font-size: 11pt; font-weight: 700; color: #8A1C14; letter-spacing: 0.5pt; line-height: 1; }
+/* ── Suggested name — sub-line inside the जन्माक्षर row ──────────────────────── */
+.jnv-sub { font-size: 5.5pt; color: #C98A2C; margin-top: 2pt; line-height: 1.2; }
 
 /* ── Verification strip ──────────────────────────────────────────────────── */
 .verify {
@@ -256,7 +247,13 @@ body {
       <div class="dcol">
         <div class="col-hdr">ज्योतिष तपशील</div>
         <div class="dr"><span class="dk">जन्म रास</span><span class="dv">{{ moon_rashi }}</span></div>
-        <div class="dr"><span class="dk">जन्माक्षर</span><span class="dv">{{ janmakshara }}</span></div>
+        <div class="dr">
+          <span class="dk">जन्माक्षर</span>
+          <span class="dv">{{ janmakshara }}</span>
+          {% if janmanav and janmanav != "—" %}
+          <span class="jnv-sub">सुचवलेले नाव: {{ janmanav }}</span>
+          {% endif %}
+        </div>
         <div class="dr"><span class="dk">नक्षत्र / चरण</span><span class="dv">{{ nakshatra }} ({{ charan }})</span></div>
         <div class="dr"><span class="dk">गण / योनी</span><span class="dv">{{ gana_yoni }}</span></div>
         <div class="dr"><span class="dk">नाडी / वर्ण</span><span class="dv">{{ nadi_varna }}</span></div>
@@ -268,14 +265,6 @@ body {
 
     </div>
   </div>
-
-  <!-- ══ SUGGESTED NAME ══ -->
-  {% if janmanav and janmanav != "—" %}
-  <div class="janmanav-strip">
-    <span class="jnv-label">सुचवलेले नाव</span>
-    <span class="jnv-value">{{ janmanav }}</span>
-  </div>
-  {% endif %}
 
   <!-- ══ BOTTOM ROW: panchang + dasha, fills remaining page height ══ -->
   <div class="bottom-row">
