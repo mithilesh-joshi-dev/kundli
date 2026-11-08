@@ -612,14 +612,11 @@ def generate_micro_mr_pdf(
     # Varna (from moon rashi)
     varna_mr = _MR_VARNA.get(RASHI_VARNA.get(moon.rashi, ""), "—") if moon else "—"
 
-    # Janmakshara (all 4 syllables for the nakshatra)
-    if nak_idx is not None:
-        syllables = NAKSHATRA_JANMAKSHARA[nak_idx]
-        janmakshara = ", ".join(syllables)
-        pada_syllable = syllables[moon.nakshatra_pada - 1] if moon else "—"
+    # Janmakshara — single syllable for the person's specific pada
+    if nak_idx is not None and moon:
+        janmakshara = NAKSHATRA_JANMAKSHARA[nak_idx][moon.nakshatra_pada - 1]
     else:
         janmakshara = "—"
-        pada_syllable = "—"
 
     # Sun rashi
     sun = next((p for p in chart.planets if p.name == "Sun"), None)
@@ -732,7 +729,7 @@ def generate_mini_mr_pdf(
     nadi_mr  = _MR_NADI.get(nak_idx % 3, "—") if nak_idx is not None else "—"
     varna_mr = _MR_VARNA.get(RASHI_VARNA.get(moon.rashi, ""), "—") if moon else "—"
     paya_mr  = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
-    janmakshara = ", ".join(NAKSHATRA_JANMAKSHARA[nak_idx]) if nak_idx is not None else "—"
+    janmakshara = NAKSHATRA_JANMAKSHARA[nak_idx][moon.nakshatra_pada - 1] if nak_idx is not None and moon else "—"
 
     moon_rashi_lord = RASHI_LORD.get(moon.rashi, "") if moon else ""
     rashi_swami_mr  = _MR_RASHI_LORD.get(moon_rashi_lord, moon_rashi_lord)
