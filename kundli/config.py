@@ -75,6 +75,16 @@ class FirebaseConfig:
 
 
 @dataclass(frozen=True)
+class StorageConfig:
+    """Firebase Cloud Storage config."""
+    bucket: str = field(default_factory=lambda: _env("FIREBASE_STORAGE_BUCKET", ""))
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.bucket)
+
+
+@dataclass(frozen=True)
 class Settings:
     server: ServerConfig = field(default_factory=ServerConfig)
     app: AppConfig = field(default_factory=AppConfig)
@@ -82,6 +92,7 @@ class Settings:
     limits: LimitsConfig = field(default_factory=LimitsConfig)
     firestore: FirestoreConfig = field(default_factory=FirestoreConfig)
     firebase: FirebaseConfig = field(default_factory=FirebaseConfig)
+    storage: StorageConfig = field(default_factory=StorageConfig)
 
 
 # Singleton — import this everywhere

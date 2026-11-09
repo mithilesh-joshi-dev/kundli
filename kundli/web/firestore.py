@@ -120,6 +120,69 @@ async def get_all_janmanav() -> list[dict]:
     return rows
 
 
+# ── Kundali Records (history) ─────────────────────────────────────────────────
+
+_RECORDS_COLLECTION = "kundali_records"
+
+
+async def save_kundali_record(record_id: str, uid: str, data: dict) -> None:
+    """Create or update a kundali record. Sets created_at on first write, always sets updated_at."""
+    if not settings.firestore.enabled:
+        return
+    try:
+        from google.cloud.firestore_v1 import SERVER_TIMESTAMP
+        client = _get_client()
+        ref = client.collection(_RECORDS_COLLECTION).document(record_id)
+        snap = await ref.get()
+        if snap.exists:
+            await ref.update({**data, "updated_at": SERVER_TIMESTAMP})
+        else:
+            await ref.set({**data, "uid": uid, "created_at": SERVER_TIMESTAMP, "updated_at": SERVER_TIMESTAMP})
+    except Exception:
+        logger.exception("Failed to save kundali record %s", record_id)
+
+
+async def get_kundali_records(uid: str) -> list[dict]:
+    """Return all kundali records for a jyotishacharya, newest first."""
+    if not settings.firestore.enabled:
+        return []
+    try:
+        client = _get_client()
+        col = client.collection(_RECORDS_COLLECTION)
+        query = col.where("uid", "==", uid).order_by("created_at", direction="DESCENDING")
+        docs = [d async for d in query.stream()]
+        return [{"id": d.id, **d.to_dict()} for d in docs]
+    except Exception:
+        logger.exception("Failed to load kundali records for uid=%s", uid)
+        return []
+
+
+async def get_kundali_record(record_id: str) -> dict | None:
+    """Fetch a single kundali record by ID."""
+    if not settings.firestore.enabled:
+        return None
+    try:
+        client = _get_client()
+        snap = await client.collection(_RECORDS_COLLECTION).document(record_id).get()
+        if snap.exists:
+            return {"id": snap.id, **snap.to_dict()}
+        return None
+    except Exception:
+        logger.exception("Failed to get kundali record %s", record_id)
+        return None
+
+
+async def delete_kundali_record(record_id: str) -> None:
+    """Hard-delete a kundali record."""
+    if not settings.firestore.enabled:
+        return
+    try:
+        client = _get_client()
+        await client.collection(_RECORDS_COLLECTION).document(record_id).delete()
+    except Exception:
+        logger.exception("Failed to delete kundali record %s", record_id)
+
+
 async def update_janmanav_entry(syllable: str, m: str, f: str) -> None:
     """Update a single janmanav entry in Firestore and the in-memory cache."""
     global _janmanav_cache
