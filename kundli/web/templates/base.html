@@ -126,6 +126,13 @@
                         Admin
                     </a>
                     {% endif %}
+                    {% if user_profile and (user_profile.is_admin or "janmanav_editor" in user_features) %}
+                    <a href="/janmanav"
+                       class="text-xs font-medium px-2 py-1 rounded-lg transition
+                              {% if page == 'janmanav' %}bg-saffron-100 text-saffron-700{% else %}text-gray-400 hover:text-saffron-600 hover:bg-saffron-50{% endif %}">
+                        जन्मनाव
+                    </a>
+                    {% endif %}
                     <a href="/profile" class="text-xs text-gray-500 hover:text-saffron-700 max-w-[120px] truncate transition">
                         {{ (user_profile.display_name if user_profile else current_user.get("name", "")) }}
                     </a>
