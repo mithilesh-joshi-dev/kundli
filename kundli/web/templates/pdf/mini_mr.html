@@ -246,7 +246,13 @@ body {
 
       <div class="dcol">
         <div class="col-hdr">ज्योतिष तपशील</div>
-        <div class="dr"><span class="dk">जन्म रास</span><span class="dv">{{ moon_rashi }}</span></div>
+        <div class="dr">
+          <span class="dk">जन्म रास</span>
+          <span class="dv">{{ moon_rashi }}</span>
+          {% if ghat_vaar and ghat_vaar != "—" %}
+          <span class="jnv-sub">घातवार: {{ ghat_vaar }}</span>
+          {% endif %}
+        </div>
         <div class="dr">
           <span class="dk">जन्माक्षर</span>
           <span class="dv">{{ janmakshara }}</span>

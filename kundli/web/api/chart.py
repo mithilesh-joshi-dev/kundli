@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from ...calc.aspects import get_aspects, get_house_aspects
-from ...calc.constants import NAKSHATRA_LORDS, NAKSHATRAS, RASHIS
+from ...calc.constants import NAKSHATRA_LORDS, NAKSHATRAS, RASHIS, RASHI_GHAT_VAAR
 from ...calc.dasha import calculate_dasha
 from ...calc.engine import calculate_chart
 from ...calc.navamsa import calculate_navamsa
@@ -125,6 +125,8 @@ def api_chart(body: BirthInput):
             "birth_star_local": T(f"nakshatra.{moon.nakshatra}"),
             "birth_star_pada": moon.nakshatra_pada,
             "nakshatra_lord": NAKSHATRA_LORDS[nak_idx],
+            "ghat_vaar": RASHI_GHAT_VAAR.get(moon.rashi, ""),
+            "ghat_vaar_local": T(f"vara.{RASHI_GHAT_VAAR.get(moon.rashi, '')}") if RASHI_GHAT_VAAR.get(moon.rashi) else "—",
         },
         "navamsa": navamsa,
         "yogas": yogas,

@@ -92,6 +92,9 @@
             <p class="flex justify-between"><span class="text-amber-700/60">{{ T("ui.tithi") }}</span> <span>{{ data.panchang.tithi }}</span></p>
             <p class="flex justify-between"><span class="text-amber-700/60">{{ T("ui.nakshatra_label") }}</span> <span>{{ data.panchang.birth_star_local }} ({{ data.panchang.birth_star_pada }})</span></p>
             <p class="flex justify-between"><span class="text-amber-700/60">{{ data.panchang.vara_local }}</span> <span>{{ data.panchang.yoga }} / {{ data.panchang.karana }}</span></p>
+            {% if data.panchang.ghat_vaar_local and data.panchang.ghat_vaar_local != "—" %}
+            <p class="flex justify-between"><span class="text-amber-700/60">{{ T("ui.ghat_vaar") }}</span> <span class="text-red-600 font-medium">{{ data.panchang.ghat_vaar_local }}</span></p>
+            {% endif %}
         </div>
     </div>
 </div>

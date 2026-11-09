@@ -201,4 +201,5 @@ TRANSLATIONS = {
     "ui.no_windows": "No favorable windows found in this range. Try extending the year range.",
     "ui.from_year": "From Year",
     "ui.to_year": "To Year",
+    "ui.ghat_vaar": "Ghat Vaar",
 }
