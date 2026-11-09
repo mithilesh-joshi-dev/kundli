@@ -446,3 +446,42 @@ async def questions_results(request: Request):
 
     ctx = {"request": request, "T": T, "lang": lang, "data": data, "person_name": person_name}
     return request.app.state.templates.TemplateResponse(request, name="partials/event_results.html", context=ctx)
+
+
+# === Janmanav Editor ===
+
+def _require_janmanav_access(request: Request):
+    from fastapi import HTTPException
+    profile = getattr(request.state, "profile", None)
+    is_admin = profile and profile.get("is_admin")
+    user_features = getattr(request.state, "user_features", set())
+    if not is_admin and "janmanav_editor" not in user_features:
+        raise HTTPException(403, "जन्मनाव संपादनासाठी परवानगी नाही.")
+
+
+@router.get("/janmanav", response_class=HTMLResponse)
+async def janmanav_editor_page(request: Request):
+    _require_janmanav_access(request)
+    from ..firestore import get_all_janmanav
+    from ...calc.constants import NAKSHATRAS
+    from ..i18n import get_translator
+    T = get_translator(settings.app.default_lang)
+    entries = await get_all_janmanav()
+    ctx = _ctx(request, "janmanav", entries=entries, T=T, NAKSHATRAS=NAKSHATRAS)
+    return request.app.state.templates.TemplateResponse(request, name="pages/janmanav.html", context=ctx)
+
+
+@router.post("/janmanav/{syllable}", response_class=HTMLResponse)
+async def janmanav_save(syllable: str, request: Request):
+    _require_janmanav_access(request)
+    from ..firestore import update_janmanav_entry
+    form = await request.form()
+    m = form.get("m", "").strip()
+    f = form.get("f", "").strip()
+    if not m or not f:
+        from fastapi import HTTPException
+        raise HTTPException(400, "नाव रिकामे असू शकत नाही.")
+    await update_janmanav_entry(syllable, m, f)
+    return HTMLResponse(
+        f'<span class="text-xs font-semibold text-green-600 saved-flash">✓ सेव झाले</span>'
+    )

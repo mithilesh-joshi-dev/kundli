@@ -15,17 +15,19 @@ ALL_FEATURES = (
     "pdf_micro",
     "pdf_mini",
     "pdf_full",
+    "janmanav_editor",
 )
 
 FEATURE_LABELS = {
-    "chart":     "कुंडली",
-    "predict":   "भविष्य",
-    "transit":   "गोचर",
-    "match":     "मिलान",
-    "questions": "प्रश्न",
-    "pdf_micro": "संक्षिप्त PDF",
-    "pdf_mini":  "कुंडलीसह PDF",
-    "pdf_full":  "संपूर्ण PDF",
+    "chart":            "कुंडली",
+    "predict":          "भविष्य",
+    "transit":          "गोचर",
+    "match":            "मिलान",
+    "questions":        "प्रश्न",
+    "pdf_micro":        "संक्षिप्त PDF",
+    "pdf_mini":         "कुंडलीसह PDF",
+    "pdf_full":         "संपूर्ण PDF",
+    "janmanav_editor":  "जन्मनाव संपादक",
 }
 
 _firebase_app = None
