@@ -13,6 +13,8 @@ Rendering:
 import os
 import sys
 from datetime import datetime, date
+
+from .. import __version__ as APP_VERSION
 from io import BytesIO
 from pathlib import Path
 
@@ -702,6 +704,7 @@ def generate_micro_mr_pdf(
         latlon=latlon,
         astrologer_name=astrologer_name or "",
         astrologer_credentials=astrologer_credentials or "",
+        app_version=APP_VERSION,
     )
 
     HTML = _weasyprint_html()
@@ -828,6 +831,7 @@ def generate_mini_mr_pdf(
         today=today,
         astrologer_name=astrologer_name or "",
         astrologer_credentials=astrologer_credentials or "",
+        app_version=APP_VERSION,
     )
 
     HTML = _weasyprint_html()
