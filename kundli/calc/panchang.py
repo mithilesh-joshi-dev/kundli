@@ -66,6 +66,13 @@ def calculate_panchang(year: int, month: int, day: int,
         # Repeating cycle of 7 karanas (Bava to Vishti)
         karana = KARANAS[(karana_idx - 1) % 7]
 
+    # Masa: determined by Sun's sidereal rashi
+    _MASAS = [
+        "Chaitra", "Vaishakha", "Jyeshtha", "Ashadha", "Shravana", "Bhadrapada",
+        "Ashwin", "Kartik", "Margashirsha", "Paush", "Magh", "Phalguna",
+    ]
+    masa = _MASAS[int(sun_sid / 30) % 12]
+
     swe.close()
 
     return {
@@ -75,4 +82,5 @@ def calculate_panchang(year: int, month: int, day: int,
         "paksha": paksha,
         "yoga": yoga,
         "karana": karana,
+        "masa": masa,
     }

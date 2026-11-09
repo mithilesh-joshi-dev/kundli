@@ -143,6 +143,13 @@ _MR_VARA = {
     "Saturday": "शनिवार",
 }
 
+_MR_MASA = {
+    "Chaitra": "चैत्र", "Vaishakha": "वैशाख", "Jyeshtha": "ज्येष्ठ",
+    "Ashadha": "आषाढ", "Shravana": "श्रावण", "Bhadrapada": "भाद्रपद",
+    "Ashwin": "आश्विन", "Kartik": "कार्तिक", "Margashirsha": "मार्गशीर्ष",
+    "Paush": "पौष", "Magh": "माघ", "Phalguna": "फाल्गुन",
+}
+
 # North Indian diamond house geometry (300×300 viewBox)
 _NI_HOUSES = {
     1:  {"points": "150,0 225,75 150,150 75,75",    "cx": 150, "cy": 68,  "nx": 150, "ny": 28},
@@ -671,7 +678,7 @@ def generate_micro_mr_pdf(
         nakshatra=nakshatra,
         charan=charan,
         nak_lord=nak_lord_name,
-        tithi=_mr_tithi(panchang["tithi"]),
+        tithi=f"{_MR_MASA.get(panchang['masa'], panchang['masa'])} {_mr_tithi(panchang['tithi'])}",
         vara=vara_mr,
         yoga=_MR_YOGA.get(panchang["yoga"], panchang["yoga"]),
         karana=_MR_KARANA.get(panchang["karana"], panchang["karana"]),
@@ -774,9 +781,10 @@ def generate_mini_mr_pdf(
             break
 
     # Panchang
+    masa_mr    = _MR_MASA.get(panchang["masa"], panchang["masa"])
     paksha     = _MR_PAKSHA.get(panchang["paksha"], panchang["paksha"])
     tithi_name = panchang["tithi"].split(" ", 1)[-1]
-    tithi_mr   = f"{paksha} {_MR_TITHI.get(tithi_name, tithi_name)}"
+    tithi_mr   = f"{masa_mr} {paksha} {_MR_TITHI.get(tithi_name, tithi_name)}"
     vara_mr    = _MR_VARA.get(panchang["vara"], panchang["vara"])
     yoga_mr    = _MR_YOGA.get(panchang["yoga"], panchang["yoga"])
     karana_mr  = _MR_KARANA.get(panchang["karana"], panchang["karana"])
