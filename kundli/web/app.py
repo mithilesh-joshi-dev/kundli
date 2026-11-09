@@ -66,7 +66,7 @@ logger = logging.getLogger("kundli")
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Kundli",
-        version="0.1.0",
+        version="1.1.0",
         description="Vedic Astrology Web Application",
         docs_url="/docs" if settings.app.debug else None,
         redoc_url=None,
@@ -130,6 +130,13 @@ def create_app() -> FastAPI:
             return _htmx_error_response(str(exc), 400)
         return JSONResponse(status_code=400, content={"detail": str(exc)})
 
+    # --- Startup ---
+
+    @app.on_event("startup")
+    async def _preload_janmanav():
+        from .firestore import ensure_janmanav_loaded
+        await ensure_janmanav_loaded()
+
     # --- Templates & Static ---
 
     templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -143,7 +150,8 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health_check():
-        return {"status": "ok", "version": "0.1.0"}
+        from .. import __version__
+        return {"status": "ok", "version": __version__}
 
     app.include_router(auth_router, tags=["auth"])
     app.include_router(chart.router, prefix="/api", tags=["chart"])

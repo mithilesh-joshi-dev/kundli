@@ -28,7 +28,7 @@ from ..calc.constants import (
     NAKSHATRA_PAYA,
     RASHI_VARNA, RASHI_LORD, PLANET_RATNA,
 )
-from ..calc.janmanav import JANMANAV
+from .firestore import get_janmanav_name_sync
 from ..calc.dasha import calculate_dasha
 from ..calc.engine import calculate_chart
 from ..calc.panchang import calculate_panchang
@@ -637,7 +637,7 @@ def generate_micro_mr_pdf(
 
     # Suggested name from janmakshar + gender
     _gk = _gender_key(gender)
-    janmanav = JANMANAV.get(janmakshara, {}).get(_gk, "—") if janmakshara != "—" else "—"
+    janmanav = get_janmanav_name_sync(janmakshara, _gk) if janmakshara != "—" else "—"
 
     # Sun rashi
     sun = next((p for p in chart.planets if p.name == "Sun"), None)
@@ -753,7 +753,7 @@ def generate_mini_mr_pdf(
     varna_mr = _MR_VARNA.get(RASHI_VARNA.get(moon.rashi, ""), "—") if moon else "—"
     paya_mr  = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
     janmakshara = NAKSHATRA_JANMAKSHARA[nak_idx][moon.nakshatra_pada - 1] if nak_idx is not None and moon else "—"
-    janmanav = JANMANAV.get(janmakshara, {}).get(_gender_key(gender), "—") if janmakshara != "—" else "—"
+    janmanav = get_janmanav_name_sync(janmakshara, _gender_key(gender)) if janmakshara != "—" else "—"
 
     moon_rashi_lord = RASHI_LORD.get(moon.rashi, "") if moon else ""
     rashi_swami_mr  = _MR_RASHI_LORD.get(moon_rashi_lord, moon_rashi_lord)

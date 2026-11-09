@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .saved-flash { animation: fadeout 2s forwards; }
+  @keyframes fadeout { 0%,70%{opacity:1} 100%{opacity:0} }
+</style>
+
+<div class="max-w-4xl mx-auto pb-10">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">जन्मनाव संपादक</h1>
+    <p class="text-sm text-gray-500 mt-1">जन्माक्षरानुसार सुचवलेली नावे संपादित करा (१०८ नोंदी)</p>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-amber-50 border-b border-amber-100 text-xs font-semibold text-amber-900 uppercase tracking-wide">
+          <th class="px-4 py-3 text-left w-28">नक्षत्र</th>
+          <th class="px-3 py-3 text-center w-10">चरण</th>
+          <th class="px-3 py-3 text-center w-14">अक्षर</th>
+          <th class="px-4 py-3 text-left">मुलाचे नाव</th>
+          <th class="px-4 py-3 text-left">मुलीचे नाव</th>
+          <th class="px-3 py-3 w-16"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% set ns = namespace(prev_nak="") %}
+        {% for e in entries %}
+        {% set row_id = "row-" ~ loop.index %}
+        <tr class="hover:bg-amber-50/40 transition-colors {% if e.nakshatra != ns.prev_nak %}border-t-2 border-amber-100{% endif %}"
+            id="{{ row_id }}">
+
+          <!-- Nakshatra (only show on first pada) -->
+          <td class="px-4 py-2.5 font-medium text-gray-700 font-devanagari text-xs">
+            {% if e.nakshatra != ns.prev_nak %}
+              {{ T("nakshatra." ~ e.nakshatra) }}
+            {% endif %}
+          </td>
+          {% set ns.prev_nak = e.nakshatra %}
+
+          <!-- Pada -->
+          <td class="px-3 py-2.5 text-center text-gray-400 text-xs">{{ e.pada }}</td>
+
+          <!-- Syllable -->
+          <td class="px-3 py-2.5 text-center">
+            <span class="inline-block bg-amber-100 text-amber-800 font-semibold font-devanagari text-sm rounded-lg px-2 py-0.5">{{ e.syllable }}</span>
+          </td>
+
+          <!-- Inline edit form spanning remaining columns -->
+          <td class="px-2 py-1.5 col-span-3" colspan="3">
+            <form hx-post="/janmanav/{{ e.syllable }}"
+                  hx-target="#status-{{ loop.index }}"
+                  hx-swap="innerHTML"
+                  class="flex items-center gap-2">
+              <input type="text" name="m" value="{{ e.m }}"
+                     required
+                     class="w-36 border border-gray-200 rounded-lg px-2.5 py-1 text-sm font-devanagari text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400"
+                     placeholder="मुलाचे नाव">
+              <input type="text" name="f" value="{{ e.f }}"
+                     required
+                     class="w-36 border border-gray-200 rounded-lg px-2.5 py-1 text-sm font-devanagari text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400"
+                     placeholder="मुलीचे नाव">
+              <button type="submit"
+                      class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                सेव
+              </button>
+              <span id="status-{{ loop.index }}" class="text-xs w-16 shrink-0 text-green-600"></span>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
