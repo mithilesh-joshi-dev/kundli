@@ -1,7 +1,6 @@
 """Firebase Cloud Storage helpers — PDF upload and URL generation."""
 
 import logging
-import uuid
 from urllib.parse import quote
 
 from ..config import settings
@@ -17,17 +16,11 @@ def _bucket():
 
 
 def _upload_sync(uid: str, record_id: str, pdf_type: str, pdf_bytes: bytes) -> str:
-    token = str(uuid.uuid4())
     path = f"kundalis/{uid}/{record_id}_{pdf_type}.pdf"
     blob = _bucket().blob(path)
-    blob.metadata = {"firebaseStorageDownloadTokens": token}
     blob.upload_from_string(pdf_bytes, content_type="application/pdf")
-    blob.patch()
     encoded = quote(path, safe="")
-    return (
-        f"https://firebasestorage.googleapis.com/v0/b/{settings.storage.bucket}"
-        f"/o/{encoded}?alt=media&token={token}"
-    )
+    return f"https://storage.googleapis.com/{settings.storage.bucket}/{encoded}"
 
 
 def _delete_sync(uid: str, record_id: str, pdf_type: str) -> None:

@@ -201,4 +201,5 @@ TRANSLATIONS = {
     "ui.no_windows": "इस अवधि में कोई अनुकूल समय नहीं मिला। वर्ष सीमा बढ़ाएं।",
     "ui.from_year": "वर्ष से",
     "ui.to_year": "वर्ष तक",
+    "ui.ghat_vaar": "घातवार",
 }

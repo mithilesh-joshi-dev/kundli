@@ -26,7 +26,7 @@ from ..calc.constants import (
     NAKSHATRA_LORDS, NAKSHATRAS,
     NAKSHATRA_GANA, NAKSHATRA_YONI, NAKSHATRA_JANMAKSHARA,
     NAKSHATRA_PAYA,
-    RASHI_VARNA, RASHI_LORD, PLANET_RATNA,
+    RASHI_VARNA, RASHI_LORD, PLANET_RATNA, RASHI_GHAT_VAAR,
 )
 from .firestore import get_janmanav_name_sync
 from ..calc.dasha import calculate_dasha
@@ -652,6 +652,10 @@ def generate_micro_mr_pdf(
     # Paya (metal) from Moon nakshatra
     paya_mr = _MR_PAYA.get(NAKSHATRA_PAYA[nak_idx], "—") if nak_idx is not None else "—"
 
+    # Ghat Vaar — inauspicious weekday from birth rashi (Ghata Chakra)
+    ghat_vaar_en = RASHI_GHAT_VAAR.get(moon.rashi, "") if moon else ""
+    ghat_vaar_mr = _MR_VARA.get(ghat_vaar_en, "—")
+
     # Lagna rashi (already computed above as lagna_rashi_mr)
 
     # Mahadasha duration
@@ -701,6 +705,7 @@ def generate_micro_mr_pdf(
         janmanav=janmanav,
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
+        ghat_vaar=ghat_vaar_mr,
         latlon=latlon,
         astrologer_name=astrologer_name or "",
         astrologer_credentials=astrologer_credentials or "",
@@ -791,6 +796,7 @@ def generate_mini_mr_pdf(
     vara_mr    = _MR_VARA.get(panchang["vara"], panchang["vara"])
     yoga_mr    = _MR_YOGA.get(panchang["yoga"], panchang["yoga"])
     karana_mr  = _MR_KARANA.get(panchang["karana"], panchang["karana"])
+    ghat_vaar_mr = _MR_VARA.get(RASHI_GHAT_VAAR.get(moon.rashi, ""), "—") if moon else "—"
 
     birth_date_dev = _to_dev(f"{birth.day:02d}/{birth.month:02d}/{birth.year}")
     birth_time_dev = _to_dev(f"{birth.hour:02d}:{birth.minute:02d}")
@@ -825,6 +831,7 @@ def generate_mini_mr_pdf(
         paya=paya_mr,
         sun_moon_rashi=f"{sun_rashi_mr} / {moon_rashi_mr}",
         rashi_swami_ratna=f"{rashi_swami_mr} / {ratna_mr}",
+        ghat_vaar=ghat_vaar_mr,
         maha_lord=maha_lord_mr, maha_range=maha_range,
         antar_lord=antar_lord_mr, antar_range=antar_range,
         d1_chart=d1_chart,

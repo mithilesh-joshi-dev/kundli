@@ -57,6 +57,14 @@ RASHI_VARNA = {
     "Makara": "Vaishya", "Kumbha": "Shudra", "Meena": "Brahmin",
 }
 
+# Ghata Chakra — inauspicious weekday per birth rashi (Maharashtrian panchang)
+RASHI_GHAT_VAAR = {
+    "Mesha": "Sunday", "Vrishabha": "Saturday", "Mithuna": "Monday",
+    "Karka": "Wednesday", "Simha": "Saturday", "Kanya": "Saturday",
+    "Tula": "Thursday", "Vrischika": "Friday", "Dhanu": "Friday",
+    "Makara": "Tuesday", "Kumbha": "Thursday", "Meena": "Friday",
+}
+
 # Lord of each rashi
 RASHI_LORD = {
     "Mesha": "Mars", "Vrishabha": "Venus", "Mithuna": "Mercury",
