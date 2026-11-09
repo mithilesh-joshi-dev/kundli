@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto pb-10">
+
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">कुंडली इतिहास</h1>
+      <p class="text-sm text-gray-500 mt-1">आपण तयार केलेल्या सर्व कुंडल्या</p>
+    </div>
+    <span class="text-sm text-gray-400">{{ records | length }} नोंदी</span>
+  </div>
+
+  {% if not records %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+    <div class="text-4xl mb-3">📜</div>
+    <p class="text-gray-500 text-sm">अद्याप कोणतीही कुंडली तयार केलेली नाही.</p>
+    <a href="/chart" class="mt-4 inline-block text-sm font-medium text-orange-600 hover:text-orange-700">
+      कुंडली तयार करा →
+    </a>
+  </div>
+  {% else %}
+
+  <div class="space-y-3">
+    {% for rec in records %}
+    <div id="rec-{{ rec.id }}"
+         class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+
+      <!-- Person info -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-semibold text-gray-900 font-devanagari">
+            {{ rec.person_name or "—" }}
+          </span>
+          {% if rec.gender == "f" %}
+          <span class="text-xs bg-pink-50 text-pink-600 border border-pink-100 rounded-full px-2 py-0.5">स्त्री</span>
+          {% elif rec.gender == "m" %}
+          <span class="text-xs bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-2 py-0.5">पुरुष</span>
+          {% endif %}
+        </div>
+        <div class="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3">
+          <span>{{ rec.birth_date }} · {{ rec.birth_time }}</span>
+          {% if rec.place %}<span>📍 {{ rec.place }}</span>{% endif %}
+        </div>
+        <div class="text-xs text-gray-400 mt-0.5">
+          तयार: {{ rec.created_at.strftime("%d %b %Y") if rec.created_at else "—" }}
+          {% if rec.updated_at and rec.updated_at != rec.created_at %}
+           · अद्यतन: {{ rec.updated_at.strftime("%d %b %Y") }}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- PDF actions -->
+      <div class="flex items-center gap-2 flex-wrap shrink-0">
+
+        <!-- Micro PDF -->
+        {% if rec.pdf_micro_url %}
+        <a href="{{ rec.pdf_micro_url }}" target="_blank"
+           class="text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-3 py-1.5 hover:bg-amber-100 transition">
+          संक्षिप्त PDF ↗
+        </a>
+        {% endif %}
+        <div id="regen-micro-{{ rec.id }}">
+          <button hx-post="/history/{{ rec.id }}/regenerate/micro"
+                  hx-target="#regen-micro-{{ rec.id }}"
+                  hx-swap="innerHTML"
+                  hx-indicator="#spin-{{ rec.id }}"
+                  class="text-xs text-gray-400 hover:text-amber-600 transition px-2 py-1.5 rounded-lg hover:bg-amber-50">
+            ↻ संक्षिप्त
+          </button>
+        </div>
+
+        <!-- Mini PDF -->
+        {% if rec.pdf_mini_url %}
+        <a href="{{ rec.pdf_mini_url }}" target="_blank"
+           class="text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg px-3 py-1.5 hover:bg-orange-100 transition">
+          कुंडलीसह PDF ↗
+        </a>
+        {% endif %}
+        <div id="regen-mini-{{ rec.id }}">
+          <button hx-post="/history/{{ rec.id }}/regenerate/mini"
+                  hx-target="#regen-mini-{{ rec.id }}"
+                  hx-swap="innerHTML"
+                  class="text-xs text-gray-400 hover:text-orange-600 transition px-2 py-1.5 rounded-lg hover:bg-orange-50">
+            ↻ कुंडलीसह
+          </button>
+        </div>
+
+        <!-- Spinner -->
+        <span id="spin-{{ rec.id }}" class="htmx-indicator text-xs text-gray-400">⏳</span>
+
+        <!-- Delete -->
+        <button hx-delete="/history/{{ rec.id }}"
+                hx-target="#rec-{{ rec.id }}"
+                hx-swap="outerHTML swap:300ms"
+                hx-confirm="ही नोंद कायमची हटवायची का?"
+                class="text-xs text-gray-300 hover:text-red-500 transition px-2 py-1.5 rounded-lg hover:bg-red-50 ml-1">
+          🗑
+        </button>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

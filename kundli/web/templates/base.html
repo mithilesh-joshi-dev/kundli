@@ -126,6 +126,13 @@
                         Admin
                     </a>
                     {% endif %}
+                    {% if current_user %}
+                    <a href="/history"
+                       class="text-xs font-medium px-2 py-1 rounded-lg transition
+                              {% if page == 'history' %}bg-saffron-100 text-saffron-700{% else %}text-gray-400 hover:text-saffron-600 hover:bg-saffron-50{% endif %}">
+                        इतिहास
+                    </a>
+                    {% endif %}
                     {% if user_profile and (user_profile.is_admin or "janmanav_editor" in user_features) %}
                     <a href="/janmanav"
                        class="text-xs font-medium px-2 py-1 rounded-lg transition

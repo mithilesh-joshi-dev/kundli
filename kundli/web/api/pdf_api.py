@@ -2,6 +2,7 @@
 
 import asyncio
 import unicodedata
+import uuid
 from functools import partial
 
 from fastapi import APIRouter, Form, Request
@@ -12,6 +13,30 @@ from ..api.common import BirthInput, parse_birth
 from ..pdf import generate_micro_mr_pdf, generate_micro_pdf, generate_mini_mr_pdf
 
 router = APIRouter()
+
+
+async def _save_to_history(
+    uid: str, record_id: str, pdf_type: str, pdf_bytes: bytes, body: BirthInput,
+    gender: str, gotra: str, parents: str,
+) -> None:
+    """Upload PDF to storage and save/update kundali record. Fire-and-forget."""
+    from ..storage import upload_pdf
+    from ..firestore import save_kundali_record
+    url = await upload_pdf(uid, record_id, pdf_type, pdf_bytes)
+    data = {
+        "person_name": body.name or "",
+        "gender": gender,
+        "birth_date": body.date,
+        "birth_time": body.time,
+        "place": body.place or "",
+        "lat": body.lat,
+        "lon": body.lon,
+        "utc_offset": body.utc_offset,
+        "gotra": gotra,
+        "parents": parents,
+        f"pdf_{pdf_type}_url": url,
+    }
+    await save_kundali_record(record_id, uid, data)
 
 
 @router.post("/api/pdf/chart")
@@ -83,6 +108,15 @@ async def pdf_chart_form(
         raise HTTPException(400, f"Report type '{report_type}' not yet available.")
 
     pdf_bytes = await loop.run_in_executor(None, fn)
+
+    # Save to history (non-blocking — don't delay the response)
+    uid = (getattr(request.state, "user", None) or {}).get("uid")
+    if uid and settings.firestore.enabled:
+        record_id = str(uuid.uuid4())
+        asyncio.ensure_future(_save_to_history(
+            uid, record_id, report_type, pdf_bytes, body,
+            gender, gotra, parents,
+        ))
 
     raw = body.name or "chart"
     ascii_name = unicodedata.normalize("NFKD", raw).encode("ascii", "ignore").decode() or "chart"

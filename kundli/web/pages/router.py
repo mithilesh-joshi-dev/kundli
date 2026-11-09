@@ -448,6 +448,99 @@ async def questions_results(request: Request):
     return request.app.state.templates.TemplateResponse(request, name="partials/event_results.html", context=ctx)
 
 
+# === Kundali History ===
+
+@router.get("/history", response_class=HTMLResponse)
+async def history_page(request: Request):
+    user = getattr(request.state, "user", None)
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(403, "लॉगिन आवश्यक आहे.")
+    from ..firestore import get_kundali_records
+    records = await get_kundali_records(user["uid"])
+    ctx = _ctx(request, "history", records=records)
+    return request.app.state.templates.TemplateResponse(request, name="pages/history.html", context=ctx)
+
+
+@router.post("/history/{record_id}/regenerate/{pdf_type}", response_class=HTMLResponse)
+async def history_regenerate(record_id: str, pdf_type: str, request: Request):
+    user = getattr(request.state, "user", None)
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(403, "लॉगिन आवश्यक आहे.")
+    from ..firestore import get_kundali_record, save_kundali_record
+    from ..storage import upload_pdf
+    from ..api.common import BirthInput, parse_birth
+    from ..auth import ALL_FEATURES
+
+    rec = await get_kundali_record(record_id)
+    if not rec or rec.get("uid") != user["uid"]:
+        from fastapi import HTTPException
+        raise HTTPException(404, "नोंद सापडली नाही.")
+
+    user_features = getattr(request.state, "user_features", None) or set(ALL_FEATURES)
+    if f"pdf_{pdf_type}" not in user_features:
+        from fastapi import HTTPException
+        raise HTTPException(403, "परवानगी नाही.")
+
+    profile = getattr(request.state, "profile", None)
+    body = BirthInput(
+        name=rec.get("person_name") or None,
+        date=rec["birth_date"], time=rec["birth_time"],
+        lat=rec.get("lat"), lon=rec.get("lon"),
+        utc_offset=rec.get("utc_offset", 5.5),
+        place=rec.get("place") or None,
+    )
+    birth = parse_birth(body)
+    kwargs = dict(
+        person_name=rec.get("person_name") or None,
+        place_name=rec.get("place") or None,
+        gender=rec.get("gender") or None,
+        gotra=rec.get("gotra") or None,
+        parents=rec.get("parents") or None,
+        astrologer_name=profile.get("display_name", "") if profile else "",
+        astrologer_credentials=profile.get("credentials", "") if profile else "",
+    )
+
+    import asyncio
+    from functools import partial
+    from ..pdf import generate_micro_mr_pdf, generate_mini_mr_pdf
+    fn = partial(generate_micro_mr_pdf if pdf_type == "micro" else generate_mini_mr_pdf, birth, **kwargs)
+    loop = asyncio.get_running_loop()
+    pdf_bytes = await loop.run_in_executor(None, fn)
+
+    url = await upload_pdf(user["uid"], record_id, pdf_type, pdf_bytes)
+    await save_kundali_record(record_id, user["uid"], {f"pdf_{pdf_type}_url": url})
+
+    return HTMLResponse(
+        f'<a href="{url}" target="_blank" '
+        f'class="inline-flex items-center gap-1 text-xs font-semibold text-green-600">'
+        f'✓ पुन्हा तयार झाले — उघडा</a>'
+    )
+
+
+@router.delete("/history/{record_id}", response_class=HTMLResponse)
+async def history_delete(record_id: str, request: Request):
+    user = getattr(request.state, "user", None)
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(403)
+    from ..firestore import get_kundali_record, delete_kundali_record
+    from ..storage import delete_pdf
+
+    rec = await get_kundali_record(record_id)
+    if not rec or rec.get("uid") != user["uid"]:
+        from fastapi import HTTPException
+        raise HTTPException(404)
+
+    await delete_kundali_record(record_id)
+    for t in ("micro", "mini"):
+        if rec.get(f"pdf_{t}_url"):
+            await delete_pdf(user["uid"], record_id, t)
+
+    return HTMLResponse("")  # HTMX swaps the row out
+
+
 # === Janmanav Editor ===
 
 def _require_janmanav_access(request: Request):
