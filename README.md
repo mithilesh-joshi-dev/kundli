@@ -1,3 +1,9 @@
+# ⚠️ DEPRECATED — This repository is no longer maintained
+
+**This project has been superseded by [jyotishya](https://github.com/mithilesh-joshi-dev/jyotishya). Do not use this repo.**
+
+---
+
 # कुंडली — Vedic Astrology Platform
 
 A professional Vedic astrology web application for Jyotishacharyas. Generates detailed birth charts (kundli) with Dasha, Transit, Ashtakavarga, predictions, and PDF reports in Marathi.
